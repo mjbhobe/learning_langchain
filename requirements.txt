@@ -1,0 +1,58 @@
+# python packages needed
+# Steps to create the virtual environment (using uv) [NOTE: $> represents command prompt!]
+#   $> cd folder/to/learning_langchain
+#   $> uv init venv . --python 3.12
+#   $> source .venv/bin/activate  # For Linux/Mac
+#       -- OR --
+#   $> .venv\Scripts\activate     # For Windows
+#   $> uv add -r requirements.txt  # this file`
+#   # add these global tools, so as not to mess with local env
+#   $> uv tool install black ipykernel
+
+
+openai
+anthropic
+google-generativeai
+
+firestore
+# black
+tiktoken
+chromadb
+transformers
+sentence-transformers
+bs4
+firecrawl-py
+streamlit
+pypdf2
+python-dotenv
+faiss-cpu
+huggingface_hub
+psycopg2
+beautifulsoup4
+yfinance
+uvicorn
+rich
+wikipedia
+
+# langchain common modules
+langchain
+langchain-community
+langchain-tavily
+langchainhub
+
+# for OpenAI
+langchain-openai
+# for accessing Google Gemini
+langchain-google-genai
+langchain-google-firestore
+# for Anthropic Claude
+langchain-anthropic
+# for Groq
+langchain-groq
+# for huggingface
+langchain-huggingface
+
+
+
+
+
