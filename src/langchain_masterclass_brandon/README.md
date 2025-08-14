@@ -1,11 +1,11 @@
-# Langchain_Brandon
-Langchain Tutorial from AI with Brandon. Instead of `poetry`, we are using `conda` to manage our environment.
+# Langchain Masterclass - AI with Brandon
 
-## Setup
-1. Start your terminal on Windows or Mac or Linux, wherever you are coding and set your working folder to a folder to which you will clone the Github repo of this code (Let's assume your working folder is c:\code or ~/code - I'll use the term $WORKING_FOLDER for this folder)
-2. Clone the github repo for this code to  $WORKING_FOLDER using the following command, this will create a sub-folder `Langchain_Brandon` under $WORKING_FOLDER.
-```bash
-$ git clone https://github.com/mjbhobe/Langchain_Brandon.git
-```
-(Github repo: https://github.com/mjbhobe/Langchain_Brandon.git).
+Langchain Tutorial from **LangChain Master Class For Beginners 2024** Youtube video published by Brandon Hancock.
+You can find the video [here](https://www.youtube.com/watch?v=yF9kGESAi3M&list=PLbM_IDvvYBgmXB8z3dnmF2DFJR4zIIl8c&index=12)
+
+Brandon has graciously made all the code available for free on his Github repo, which you can find [here](https://github.com/bhancockio/langchain-crash-course)
+
+For instructions on how to setup your Python environment read [this Readme](..\..\README.md)
+
+
 
