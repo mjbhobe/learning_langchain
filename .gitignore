@@ -6,6 +6,7 @@ chroma_db/
 faiss_index/
 hugging_db/
 *.sqlite3
+learning_langchain.egg-info/
 
 # C extensions
 *.so
