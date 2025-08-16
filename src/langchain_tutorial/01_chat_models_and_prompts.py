@@ -4,7 +4,7 @@
     Google Gemini Flash 2.x model in this series, but you can you any
     LLM, including open source LLMs, of your choice.
 
-@author: Manish Bhobe
+@author: Manish Bhobé
 My experiments with AI/Gen AI. Code shared for learning purposes only.
 Use at your own risk!!
 """

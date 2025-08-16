@@ -1,8 +1,8 @@
-""" hello_gemini.py: Hello Google Gemini
-This module introduces Google Gemini API and tests whether everything is 
+"""hello_gemini.py: Hello Google Gemini
+This module introduces Google Gemini API and tests whether everything is
 setup correctly to use the Google Gemini LLM
 
-@author: Manish Bhobe
+@author: Manish Bhobé
 My experiments with Python, Data Science, Deep Learning & Generative AI.
 Code is made available as-is & for learning purposes only, please use at your own risk!!
 """

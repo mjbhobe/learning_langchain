@@ -1,7 +1,7 @@
-""" hello_gemini_streamlit.py: 
+"""hello_gemini_streamlit.py:
 This is a streamlit based Q&A application with Google Gemini LLM
 
-@author: Manish Bhobe
+@author: Manish Bhobé
 My experiments with Python, Data Science, Deep Learning & Generative AI.
 Code is made available as-is & for learning purposes only, please use at your own risk!!
 """

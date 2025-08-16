@@ -1,7 +1,7 @@
 """ 
 hello_gemini_langchain.py: integrating Google Geimini into Langchain, a simple example
 
-@author: Manish Bhobe
+@author: Manish Bhobé
 My experiments with Python, Data Science, Deep Learning & Generative AI.
 Code is made available as-is & for learning purposes only, please use at your own risk!!
 """

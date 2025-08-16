@@ -1,7 +1,7 @@
-""" hello_gemini_chatbot.py: Chatbot with Google Gemini
+"""hello_gemini_chatbot.py: Chatbot with Google Gemini
 Google Gemini powered Q&A Chatbot with a streamlit GUI
 
-@author: Manish Bhobe
+@author: Manish Bhobé
 My experiments with Python, Data Science, Deep Learning & Generative AI.
 Code is made available as-is & for learning purposes only, please use at your own risk!!
 """
