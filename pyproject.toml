@@ -26,6 +26,7 @@ dependencies = [
     "langchainhub>=0.1.21",
     "openai>=1.99.9",
     "psycopg2>=2.9.10",
+    "pypdf>=6.0.0",
     "pypdf2>=3.0.1",
     "python-dotenv>=1.1.1",
     "rich>=14.1.0",
