@@ -1,6 +1,6 @@
 """
-03_semantic_search.py: building a Semantic search (RAG) application
-    using LangChain and Google Gemini
+03_semantic_search.py: Build a semantic search engine over a
+    PDF with document loaders, embedding models, and vector stores.
 
 @author: Manish Bhobé
 My experiments with AI/Gen AI. Code shared for learning purposes only.

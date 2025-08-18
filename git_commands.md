@@ -20,17 +20,17 @@ $> git init
 ```bash
 $> git remote add origin https://github.com/yourusername/Pytorch-Projects.git
 ```
-4. **IMP:**Feth the latest files from remote repo
+4. **IMPORTANT:** Fetch the latest files from remote repository!
 ```bash
 $> git pull origin main --allow-unrelated-histories
 ```
 The following commands to be run every time you add new files or edit/change existing ones. 
 **Run these in the sequence shown**
 ```bash
-$> git add -A  # same as "Stage all changes"
-$> git commit -m "<<your comment>>" # same as "Commit Staged"
+$> git add -A  # same as "Stage all changes" in VS Code
+$> git commit -m "<<your comment>>" # same as "Commit Staged" in VS Code
 $> git pull    # pull all remote changes (optional)
-$> git push origin main
+$> git push origin main 
 ```
 
 
