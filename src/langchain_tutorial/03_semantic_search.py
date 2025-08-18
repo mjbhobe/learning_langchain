@@ -104,8 +104,14 @@ prompt_template = ChatPromptTemplate.from_messages(
 query = ""
 while True:
     console.print(f"[yellow]Your query? [/yellow]", end="")
-    query = input()
-    if query.strip().lower() in ["exit", "quit", "q", "bye"]:
+    query = input().strip().lower()
+    if len(query) <= 0:
+        # user must eter a query
+        console.print("[red]Please enter a query![/red]")
+        continue
+    elif query in ["exit", "quit", "q", "bye"]:
+        # and it should not be one of these words
+        console.print("[red]Exiting application. Bye![/red]")
         break
 
     # get the context for the query from the documents
