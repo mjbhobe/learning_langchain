@@ -5,19 +5,25 @@
 My experiments with AI/Gen AI. Code shared for learning purposes only.
 Use at your own risk!!
 """
-import bs4
+
+import bs4, sys
 import pathlib
 from dotenv import load_dotenv
+from typing import List
 from rich.console import Console
 from rich.markdown import Markdown
 
 from langchain.chat_models import init_chat_model
+from langchain_core.documents import Document
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # since we are using Gemini, we'll use Google embeddings
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
+
+from langgraph.graph import StateGraph, START, END
+from typing import TypedDict
 
 # load API keys from .env files
 load_dotenv(override=True)
@@ -35,7 +41,7 @@ def create_or_load_embeddings():
         # in this example we'll load document from a URL
         web_url = "https://lilianweng.github.io/posts/2023-06-23-agent/"
         console.print(
-            f"[yellow]Loading the PDF {web_url}. Please wait...[/yellow]"
+            f"[yellow]Loading document from URL {web_url}. Please wait...[/yellow]"
         )
         loader = WebBaseLoader(
             web_paths=(web_url,),
@@ -46,25 +52,20 @@ def create_or_load_embeddings():
             ),
         )
         docs = loader.load()
-        
 
-        if not pdf_path.exists():
-            raise FileNotFoundError(f"PDF file not found: {pdf_path}")
-        loader = PyPDFLoader(str(pdf_path))
-        docs = loader.load()
-        console.print(f"[blue]Loaded {len(docs)} documents[/blue]")
+        console.print(f"[blue]Loaded {len(docs)} documents from URL[/blue]")
         console.print(f"[blue]Metadata of first document: {docs[0].metadata}[/blue]")
         console.print(
             f"[blue]First 200 chars of first document: {docs[0].page_content[:200]}[/blue]"
         )
 
-        # split PDF into chunks of 1000 chars with 200 chars overlap
+        # split document into chunks of 1000 chars with 200 chars overlap
         console.print(f"[yellow]Chunking the PDF. Please wait...[/yellow]")
-        chunk_size: int = 1000
-        overlap: int = 200
 
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=chunk_size, chunk_overlap=overlap
+            chunk_size=1000,
+            chunk_overlap=200,
+            add_start_index=True,  # track index in original documen
         )
         all_splits = text_splitter.split_documents(docs)
         console.print(f"[blue]Created {len(all_splits)} chunks[/blue]")
@@ -99,7 +100,7 @@ prompt_template = ChatPromptTemplate.from_messages(
         (
             "system",
             "You are a helpful assistant. Read the question and scan the context provided and "
-            "respond from the context only. If answer does not appear in the context respond "
+            "respond only from the context provided. If answer does not appear in the context respond "
             "with an appropriate polite message, such as \"I'm sorry, I don't have that information.\"",
         ),
         (
@@ -111,9 +112,41 @@ prompt_template = ChatPromptTemplate.from_messages(
 )
 
 
+# now build a graph using LangGraph
+# NOTE: this does not store the query history!!
+class State(TypedDict):
+    question: str
+    context: List[Document]
+    answer: str
+
+
+# define the nodes of the graph
+def retrieve(state: State):
+    results = vector_store.similarity_search(state["question"])
+    return {"context": results}
+
+
+def generate(state: State):
+    context = "\n\n".join(doc.page_content for doc in state["context"])
+    prompt = prompt_template.invoke({"context": context, "question": state["question"]})
+    response = llm.invoke(prompt)
+    return {"answer": response.content}
+
+
+builder = StateGraph(State)
+builder.add_node("retrieve", retrieve)
+builder.add_node("generate", generate)
+# build the graph
+builder.add_edge(START, "retrieve")
+builder.add_edge("retrieve", "generate")
+builder.add_edge("generate", END)
+graph = builder.compile()
+
+# and ask away
+
 query = ""
 while True:
-    console.print(f"[yellow]Your query? [/yellow]", end="")
+    console.print(f"[blue]Your query? [/blue]", end="")
     query = input().strip().lower()
     if len(query) <= 0:
         # user must eter a query
@@ -125,18 +158,6 @@ while True:
         break
 
     # get the context for the query from the documents
-    results = vector_store.similarity_search(query)
-    console.print(f"[blue]Query: [/blue]{query}")
-    console.print(f"[green]Found {len(results)} results [/green]")
-    # display the similarity search results
-    context = ""
-    for i, result in enumerate(results):
-        console.print(Markdown(f"**Answer #{i+1}**: {result.page_content}"))
-        console.print(f"[blue]Metadata: {result.metadata}\n[/blue]")
-        context += f"\n\n{result.page_content}"
-
-    prompt = prompt_template.invoke({"context": context, "question": query})
-    response = llm.invoke(prompt)
-    md = Markdown(response.content)
-    console.print(f"[green]AI: [/green]\n\n")
-    console.print(md)
+    response = graph.invoke({"question": query})
+    console.print(f"[green]AI Response: [/green]\n")
+    console.print(Markdown(response["answer"]))
