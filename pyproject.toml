@@ -24,6 +24,7 @@ dependencies = [
     "langchain-openai>=0.3.30",
     "langchain-tavily>=0.2.11",
     "langchainhub>=0.1.21",
+    "langgraph>=0.6.5",
     "openai>=1.99.9",
     "psycopg2>=2.9.10",
     "pypdf>=6.0.0",
