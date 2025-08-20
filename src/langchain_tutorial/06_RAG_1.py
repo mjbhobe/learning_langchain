@@ -9,7 +9,7 @@ Use at your own risk!!
 import bs4, sys
 import pathlib
 from dotenv import load_dotenv
-from typing import List
+from typing import List, TypedDict
 from rich.console import Console
 from rich.markdown import Markdown
 
@@ -23,7 +23,6 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
 
 from langgraph.graph import StateGraph, START, END
-from typing import TypedDict
 
 # load API keys from .env files
 load_dotenv(override=True)
