@@ -1,5 +1,5 @@
 """
-06_RAG_1.py: building a RAG application with Langchain & LangGraph
+06_RAG_1.py: building a naive RAG application with Langchain & LangGraph
 
 @author: Manish Bhobé
 My experiments with AI/Gen AI. Code shared for learning purposes only.
