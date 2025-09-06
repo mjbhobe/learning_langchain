@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 from typing import List, TypedDict
 from rich.console import Console
 from rich.markdown import Markdown
+from collections import defaultdict
 
 from langchain.chat_models import init_chat_model
 from langchain_core.documents import Document
@@ -136,6 +137,77 @@ def normalize_metadata(chunks: List) -> None:
             d.metadata["sheet"] = str(sheet)
 
 
+def format_references(docs: List[Document]) -> str:
+    """Build a stable References block from retrieved docs' metadata."""
+    per_file_pages = defaultdict(set)
+    file_to_uri = {}
+
+    for d in docs:
+        meta = d.metadata or {}
+        src_file = (
+            meta.get("source_file")
+            or meta.get("source_path")
+            or meta.get("source")
+            or "unknown"
+        )
+        page = meta.get("page")
+        if page is not None:
+            # Cast to int when possible to avoid mixed sort
+            try:
+                page = int(page)
+            except Exception:
+                pass
+        per_file_pages[src_file].add(page)
+        # keep the last seen uri (or the first; doesn’t matter much)
+        file_to_uri[src_file] = meta.get("file_uri") or meta.get("source_path") or ""
+
+    lines = []
+    for src_file in sorted(per_file_pages.keys()):
+        pages = per_file_pages[src_file]
+        # filter out None pages (text/word may not have pages)
+        numeric = sorted([p for p in pages if isinstance(p, int)])
+        non_numeric = sorted(
+            [p for p in pages if not isinstance(p, int) and p is not None]
+        )
+
+        if numeric and non_numeric:
+            page_str = f"pages {', '.join(map(str, numeric))}; {', '.join(map(str, non_numeric))}"
+        elif numeric:
+            page_str = f"pages {', '.join(map(str, numeric))}"
+        elif non_numeric:
+            page_str = ", ".join(map(str, non_numeric))
+        else:
+            page_str = "(no page info)"
+
+        uri = file_to_uri.get(src_file) or ""
+        if uri:
+            lines.append(f"- {src_file} — {page_str} — {uri}")
+        else:
+            lines.append(f"- {src_file} — {page_str}")
+
+    if not lines:
+        return "References: (none)"
+    return "References:\n" + "\n".join(lines)
+
+
+def build_model_context(docs: List[Document]) -> str:
+    """builds context for model (from similarity search) with meta data for printing references"""
+    tagged_chunks = []
+    for i, d in enumerate(docs, 1):
+        meta = d.metadata or {}
+        src_file = (
+            meta.get("source_file")
+            or meta.get("source_path")
+            or meta.get("source")
+            or "unknown"
+        )
+        page = meta.get("page", "NA")
+        tagged_chunks.append(
+            f"<<chunk {i} | file:{src_file} | page:{page}>>\n{d.page_content}\n<<end chunk {i}>>"
+        )
+    return "\n\n".join(tagged_chunks)
+
+
 def create_or_load_embeddings():
     """creates if not available or loads from disk a FAISS embedding"""
     if not faiss_store.exists():
@@ -198,11 +270,10 @@ prompt_template = ChatPromptTemplate.from_messages(
         ),
         (
             "user",
-            "Based on the following context\n\nContext: {context},\n\nanswer this question: {question}"
-            "Return the answer first. Then add a short 'References' section listing the source_file and page "
-            "for the snippets you used.\n",
+            "Based on the following context\n\nContext: {context}\n\n"
+            "Answer this question: {question}\n\n"
+            "Return only the answer.",
         ),
-        # ("assistant", "Sure, let me think..."),
     ],
 )
 
@@ -217,15 +288,21 @@ class State(TypedDict):
 
 # define the nodes of the graph
 def retrieve(state: State):
-    results = vector_store.similarity_search(state["question"])
+    # retrieve top-k chunks using similarity search (k=6)
+    results = vector_store.similarity_search(state["question"], k=6)
     return {"context": results}
 
 
 def generate(state: State):
-    context = "\n\n".join(doc.page_content for doc in state["context"])
+    # context = "\n\n".join(doc.page_content for doc in state["context"])
+    context = build_model_context(state["context"])
     prompt = prompt_template.invoke({"context": context, "question": state["question"]})
     response = llm.invoke(prompt)
-    return {"answer": response.content}
+
+    # and the references
+    refs = format_references(state["context"])
+    answer = f"{response.content}\n\n{refs}"
+    return {"answer": answer}
 
 
 builder = StateGraph(State)
