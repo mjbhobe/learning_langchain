@@ -22,9 +22,9 @@ These are the steps to setup the Python environment (**NOTE**: in the code listi
 
     $> .venv\Scripts\activate ## on Windows
     ```
-4. Install the packages from `pyproject.toml` file
+4. Recreate the environmant - will install the packages from `pyproject.toml` file
     ```bash
-    $> uv pip install --editable .
+    $> uv sync
     ```
 5. Install some _global_ packages - these will be installed globally without _polluting_ your local Python environment. The include packages such as `ipykernel` (to run Notebook files) and `black` (to format Python code)
     ```bash
