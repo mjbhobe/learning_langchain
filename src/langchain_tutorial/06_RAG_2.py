@@ -2,7 +2,8 @@
 06_RAG_2.py: building a multi document RAG application with LangChain & LangGraph
     In this example we'll use multiple text files, but the code to build the vector
     store is generic and can be used for multiple types of files (PDF, text, markdown,
-    Word & Excel files - all saved in 1 location)
+    Word & Excel files - all saved in 1 location). Also, we show references from where
+    the resposes were sourced from.
 
 @author: Manish Bhobé
 My experiments with AI/Gen AI. Code shared for learning purposes only.
