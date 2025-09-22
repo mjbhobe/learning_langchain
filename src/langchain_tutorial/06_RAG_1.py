@@ -61,10 +61,10 @@ def create_or_load_embeddings():
         # split document into chunks of 1000 chars with 200 chars overlap
         console.print(f"[yellow]Chunking the PDF. Please wait...[/yellow]")
 
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200,
-            add_start_index=True,  # track index in original documen
+        text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
+            chunk_size=300,
+            chunk_overlap=50,
+            # add_start_index=True,  # track index in original documen
         )
         all_splits = text_splitter.split_documents(docs)
         console.print(f"[blue]Created {len(all_splits)} chunks[/blue]")
