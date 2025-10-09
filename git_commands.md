@@ -3,10 +3,12 @@ This file lists all the git commands you can run to connect a local folder to a 
 
 **Assumptions**:
 Assume the following steps have been completed:
-- You have created a repo on Github called `Pytorch-Project` (so it will be available at `https://github.com/yourusername/Pytorch-Projects.git`)
-- You are developing all your code in a local folder `/dev/code/pytorch_project`
+- You have created a repo on Github called `Pytorch-Project` (so it will be available at `https://github.com/yourusername/Pytorch-Projects.git`). Your main branch is called _main_
+- Assume that you are developing all your code in a local folder `/dev/code/pytorch_project` and you did this _after_ creating the rep on Github
+- Now you want to _connect_ this _local_ folder to the Github _remote repo_.
 
-**Steps**:
+
+### Steps
 Run the following commands in sequence:
 1. Navigate to your local folder<br/>
 ```bash
@@ -24,14 +26,26 @@ $> git remote add origin https://github.com/yourusername/Pytorch-Projects.git
 ```bash
 $> git pull origin main --allow-unrelated-histories
 ```
-The following commands to be run every time you add new files or edit/change existing ones. 
-**Run these in the sequence shown**
-```bash
-$> git add -A  # same as "Stage all changes" in VS Code
-$> git commit -m "<<your comment>>" # same as "Commit Staged" in VS Code
-$> git pull    # pull all remote changes (optional)
-$> git push origin main 
-```
+That's it - this will _connect_ your _local_ folder to the _remote Git repo_!
 
+### Versioning local files
+The following commands to be run every time you add new files or edit/change existing ones. 
+
+**Run these commands from command line in the sequence shown**. As before, the `$>` represents the command prompt & should NOT be typed. The line beginning with `#` is a comment explaining what the _previous_ command does and should NOT be typed.
+
+```bash
+$> git add -A  
+# same as "Stage all changes" in VS Code
+
+$> git commit -m "<<your comment>>" 
+# same as "Commit Staged" in VS Code (replace <<your comments>> with appropriate commit comments)
+
+$> git pull    
+# pull all remote changes (optional)
+
+$> git push origin main 
+# push all committed changes to remote repo
+```
+**NOTE:** if your main branch was called something other than _main_ (for example _master_), then replace `main` with `master` in the last command above.
 
 
