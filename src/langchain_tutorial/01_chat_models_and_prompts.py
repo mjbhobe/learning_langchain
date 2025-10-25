@@ -1,6 +1,6 @@
 """
 01_chat_models_and_prompts.py - calling an LLM with Langchain and System
-    and Human messages, without prompt templated. We'll be using the
+    and Human messages, without prompt templates. We'll be using the
     Google Gemini Flash 2.x model in this series, but you can you any
     LLM, including open source LLMs, of your choice.
 
@@ -15,7 +15,9 @@ from rich.console import Console
 from langchain.chat_models import init_chat_model
 from langchain_core.messages import HumanMessage, SystemMessage
 
+# load API keys from .env file
 load_dotenv(override=True)
+# for showing colored/formatted text output to the console
 console = Console()
 
 # we'll use Gemini 2.0 flash
@@ -30,6 +32,8 @@ messages = [
 ]
 
 response = llm.invoke(messages)
+
+# display results
 console.print(f"[blue]System: [/blue]{system_message}")
 console.print(f"[green]Human: [/green]{human_message}")
 console.print(f"[yellow]AI: [/yellow]{response.content}")
