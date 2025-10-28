@@ -30,11 +30,11 @@ messages = [
 ]
 
 response = llm.invoke(messages)
-console.print(f"[blue]System: [/blue]{system_message}")
-console.print(f"[green]Human: [/green]{human_message}")
-console.print(f"[yellow]AI: [/yellow]{response.content}")
+console.print(f"System: {system_message}",style="#C8A16D")
+console.print(f"Human: {human_message}", style="#85C46C")
+console.print(f"AI: {response.content}", style="#6C95EB")
 
 # also try streaming the response
 console.print("[red]With streaming...[/red]")
 for token in llm.stream(messages):
-    console.print(f"[yellow]{token.content}[/yellow]", end="|")
+    console.print(f"{token.content}", end="|", style="#6C95EB")

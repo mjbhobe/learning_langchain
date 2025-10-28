@@ -36,20 +36,22 @@ def create_or_load_embeddings():
         # load the PDF into memory
         pdf_path = pathlib.Path(__file__).parent / "docs" / "nike-10k-2023.pdf"
         console.print(
-            f"[yellow]Loading the PDF {str(pdf_path)}. Please wait...[/yellow]"
+            f"Loading the PDF {str(pdf_path)}. Please wait...",
+            style="#C8A16D",
         )
         if not pdf_path.exists():
             raise FileNotFoundError(f"PDF file not found: {pdf_path}")
         loader = PyPDFLoader(str(pdf_path))
         docs = loader.load()
-        console.print(f"[blue]Loaded {len(docs)} documents[/blue]")
-        console.print(f"[blue]Metadata of first document: {docs[0].metadata}[/blue]")
+        console.print(f"Loaded {len(docs)} documents", style="#6C95EB")
+        console.print(f"Metadata of first document: {docs[0].metadata}", style="#6C95EB")
         console.print(
-            f"[blue]First 200 chars of first document: {docs[0].page_content[:200]}[/blue]"
+            f"First 200 chars of first document: {docs[0].page_content[:200]}",
+            style="#6C95EB",
         )
 
         # split PDF into chunks of 1000 chars with 200 chars overlap
-        console.print(f"[yellow]Chunking the PDF. Please wait...[/yellow]")
+        console.print(f"Chunking the PDF. Please wait...", style="#C8A16D")
         chunk_size: int = 1000
         overlap: int = 200
 
@@ -57,20 +59,21 @@ def create_or_load_embeddings():
             chunk_size=chunk_size, chunk_overlap=overlap
         )
         all_splits = text_splitter.split_documents(docs)
-        console.print(f"[blue]Created {len(all_splits)} chunks[/blue]")
+        console.print(f"Created {len(all_splits)} chunks")
 
         # save to embeddings
 
-        console.print("[yellow]Creating embeddings. Please wait...[/yellow]")
+        console.print("Creating embeddings. Please wait...", style="#C8A16D")
         embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
         vector_store = FAISS.from_documents(all_splits, embeddings)
         vector_store.save_local(str(faiss_store))
         console.print(
-            f"[yellow]Local embeddings created at {str(faiss_store)}[/yellow]"
+            f"Local embeddings created at {str(faiss_store)}",
+            style="#C8A16D",
         )
     else:
         console.print(
-            f"[yellow]Loading existing embeddings from {str(faiss_store)}[/yellow]"
+            f"Loading existing embeddings from {str(faiss_store)}", style="#C8A16D"
         )
         embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
         vector_store = FAISS.load_local(
@@ -103,7 +106,7 @@ prompt_template = ChatPromptTemplate.from_messages(
 
 query = ""
 while True:
-    console.print(f"[yellow]Your query? [/yellow]", end="")
+    console.print(f"Your query? ", end="", style="#C8A16D")
     query = input().strip().lower()
     if len(query) <= 0:
         # user must eter a query
@@ -116,17 +119,17 @@ while True:
 
     # get the context for the query from the documents
     results = vector_store.similarity_search(query)
-    console.print(f"[blue]Query: [/blue]{query}")
-    console.print(f"[green]Found {len(results)} results [/green]")
+    console.print(f"Query: {query}")
+    console.print(f"Found {len(results)} results ", style="#85C46C")
     # display the similarity search results
     context = ""
     for i, result in enumerate(results):
         console.print(Markdown(f"**Answer #{i+1}**: {result.page_content}"))
-        console.print(f"[blue]Metadata: {result.metadata}\n[/blue]")
+        console.print(f"Metadata: {result.metadata}\n")
         context += f"\n\n{result.page_content}"
 
     prompt = prompt_template.invoke({"context": context, "question": query})
     response = llm.invoke(prompt)
     md = Markdown(response.content)
-    console.print(f"[green]AI: [/green]\n\n")
+    console.print(f"AI: \n\n", style="#85C46C")
     console.print(md)
