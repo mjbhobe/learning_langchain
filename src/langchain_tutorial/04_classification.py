@@ -20,7 +20,10 @@ load_dotenv(override=True)
 console = Console()
 
 # create our LLM - we'll be using Gemini-2.5-flash
-llm = init_chat_model("google_genai:gemini-2.5-flash", temperature=0.0)
+# llm = init_chat_model("google_genai:gemini-2.5-flash", temperature=0.0)
+
+# create our LLM - we'll be using Anthropic's Claude-Sonnet 3.7
+llm = init_chat_model("claude-3-7-sonnet-20250219", model_provider="anthropic")
 
 # in this example, we'll provide the model with some text and ask it to
 # sentiment, aggressiveness and language of the text
