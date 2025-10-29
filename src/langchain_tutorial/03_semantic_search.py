@@ -17,7 +17,9 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # since we are using Gemini, we'll use Google embeddings
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+# from langchain_google_genai import GoogleGenerativeAIEmbeddings
+# since we are using OpenAI we'll use OpenAI embeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 
 # load API keys from .env files
@@ -25,8 +27,9 @@ load_dotenv(override=True)
 # for colorful text output
 console = Console()
 
-# create our LLM - we'll be using Gemini-2.5-flash
-llm = init_chat_model("google_genai:gemini-2.5-flash", temperature=0.0)
+# we'll use OpenAI gpt-4o-mini
+# llm = init_chat_model("google_genai:gemini-2.0-flash", temperature=0.0)
+llm = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0.0)
 faiss_store = pathlib.Path(__file__).parent / "faiss_index"
 
 
@@ -62,7 +65,8 @@ def create_or_load_embeddings():
         # save to embeddings
 
         console.print("[yellow]Creating embeddings. Please wait...[/yellow]")
-        embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+        # embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+        embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
         vector_store = FAISS.from_documents(all_splits, embeddings)
         vector_store.save_local(str(faiss_store))
         console.print(
@@ -72,7 +76,8 @@ def create_or_load_embeddings():
         console.print(
             f"[yellow]Loading existing embeddings from {str(faiss_store)}[/yellow]"
         )
-        embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+        # embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+        embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
         vector_store = FAISS.load_local(
             str(faiss_store), embeddings, allow_dangerous_deserialization=True
         )
