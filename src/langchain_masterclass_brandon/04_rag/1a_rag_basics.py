@@ -1,5 +1,5 @@
 """
-1a_rag_basics.py - build the vector store in the faiss_index directory
+1a_rag_basics.py - build the vector store in the faiss_index__ directory
   NOTE: we do not call LLM yet!
 
 @author: Manish Bhobé
@@ -34,7 +34,7 @@ load_dotenv()
 console = Console()
 logger = get_logger()
 
-faiss_index_path = Path(__file__).parent / "faiss_index"
+faiss_index_path = Path(__file__).parent / "faiss_index__"
 
 if not faiss_index_path.exists():
     # create the embeddings

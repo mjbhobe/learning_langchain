@@ -8,6 +8,7 @@ Use at your own risk!!
 """
 
 import pathlib
+from textwrap import dedent
 from dotenv import load_dotenv
 from rich.console import Console
 from rich.markdown import Markdown
@@ -66,7 +67,7 @@ def create_or_load_embeddings():
 
         # save to embeddings
 
-        console.print("[yellow]Creating embeddings. Please wait...[/yellow]")
+        console.print("Creating embeddings. Please wait...", style="#C8A16D")
         # embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
         embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
         vector_store = FAISS.from_documents(all_splits, embeddings)
@@ -114,11 +115,11 @@ while True:
     console.print(f"Your query? ", end="", style="#C8A16D")
     query = input().strip().lower()
     if len(query) <= 0:
-        # user must eter a query
+        # user must enter a query
         console.print("[red]Please enter a query![/red]")
         continue
     elif query in ["exit", "quit", "q", "bye"]:
-        # and it should not be one of these words
+        # but if it is one of these words, the quit
         console.print("[red]Exiting application. Bye![/red]")
         break
 
@@ -135,6 +136,6 @@ while True:
 
     prompt = prompt_template.invoke({"context": context, "question": query})
     response = llm.invoke(prompt)
-    md = Markdown(response.content)
-    console.print(f"AI: \n\n", style="#85C46C")
+    md = Markdown(dedent(response.content))
+    console.print(f"AI:", style="#85C46C")
     console.print(md)

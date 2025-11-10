@@ -30,7 +30,7 @@ load_dotenv()
 console = Console()
 logger = get_logger()
 
-faiss_index_path = Path(__file__).parent / "faiss_index"
+faiss_index_path = Path(__file__).parent / "faiss_index__"
 
 if not faiss_index_path.exists():
     # create the embeddings
