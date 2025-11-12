@@ -18,11 +18,13 @@ from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate
 
 load_dotenv(override=True)
-console = Console()
+console = Console()  
+
+
+llm = init_chat_model("google_genai:gemini-2.5-flash", temperature=0.0)
 
 # we'll use OpenAI gpt-4o-mini
-# llm = init_chat_model("google_genai:gemini-2.0-flash", temperature=0.0)
-llm = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0.0)
+# llm = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0.0)
 
 system_message: str = "Translate the following from English into {language}"
 
