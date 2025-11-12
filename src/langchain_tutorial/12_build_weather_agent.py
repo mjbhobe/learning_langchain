@@ -9,7 +9,8 @@ from pyowm import OWM
 
 load_dotenv(override=True)
 
-# Initialize OpenWeatherMap client
+# Initialize OpenWeatherMap client (has weather details for most major cities)
+# NOTE: you will need an OpenWeatherMap API key 
 OWM_API_KEY = os.getenv("OWM_API_KEY") # Ensure you set this environment variable
 if not OWM_API_KEY:
     raise ValueError("OWM_API_KEY environment variable not set.")
