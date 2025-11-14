@@ -47,6 +47,7 @@ class Person(BaseModel):
         default=None,
         description="The color of the person's hair if known",
     )
+    # NOTE: some LLM's are smart enough to convert height from other units to meters,
     height_in_meters: Optional[str] = Field(
         default=None,
         description="Height measured in meters",

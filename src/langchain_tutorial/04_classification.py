@@ -26,14 +26,14 @@ console = Console()
 llm = init_chat_model("claude-3-7-sonnet-20250219", model_provider="anthropic")
 
 # in this example, we'll provide the model with some text and ask it to
-# sentiment, aggressiveness and language of the text
-# A trick is to use a Pydantic model to define the structured output
-
+# determine the sentimentaggressiveness and language of the text provided.
+# A trick is to use a Pydantic model to define the structured output that
+# can capture all these attributes we are looking to extract.
 
 # Step 1 - define the fields of the structured output as a Pydantic model
 
 # NOTE: comment out one of the following 2 class definitions
-# for a more detailed specification, go with the 2nd one
+# for a more elaborate specification, go with the 2nd one
 
 
 class Classification(BaseModel):
@@ -50,7 +50,7 @@ class Classification(BaseModel):
 #     )
 #     aggressiveness: Literal[1, 2, 3, 4, 5] = Field(
 #         ...,
-#         description="Describes how aggressive the statement is; the higher the number, the more aggressive",
+#         description="Describes how aggressive the statement is; the higher the number, the more aggressive it is",
 #     )
 #     language: Literal["spanish", "english", "french", "german", "italian"] = Field(
 #         ..., description="The language the text is written in"

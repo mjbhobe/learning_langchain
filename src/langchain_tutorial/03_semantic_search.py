@@ -21,6 +21,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 # from langchain_google_genai import GoogleGenerativeAIEmbeddings
 # since we are using OpenAI we'll use OpenAI embeddings
 from langchain_openai import OpenAIEmbeddings
+
 from langchain_community.vectorstores import FAISS
 
 # load API keys from .env files
@@ -28,10 +29,16 @@ load_dotenv(override=True)
 # for colorful text output
 console = Console()
 
-# we'll use OpenAI gpt-4o-mini
+# we'll use Google Gemini Flash 2.0
 # llm = init_chat_model("google_genai:gemini-2.0-flash", temperature=0.0)
+# embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+# faiss_store = pathlib.Path(__file__).parent / "faiss_index_gemini"
+
+
+# we'll use OpenAI gpt-4o-mini
 llm = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0.0)
-faiss_store = pathlib.Path(__file__).parent / "faiss_index"
+faiss_store = pathlib.Path(__file__).parent / "faiss_index_openai"
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 
 
 def create_or_load_embeddings():
@@ -48,7 +55,9 @@ def create_or_load_embeddings():
         loader = PyPDFLoader(str(pdf_path))
         docs = loader.load()
         console.print(f"Loaded {len(docs)} documents", style="#6C95EB")
-        console.print(f"Metadata of first document: {docs[0].metadata}", style="#6C95EB")
+        console.print(
+            f"Metadata of first document: {docs[0].metadata}", style="#6C95EB"
+        )
         console.print(
             f"First 200 chars of first document: {docs[0].page_content[:200]}",
             style="#6C95EB",
@@ -69,7 +78,7 @@ def create_or_load_embeddings():
 
         console.print("Creating embeddings. Please wait...", style="#C8A16D")
         # embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-        embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+        # embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
         vector_store = FAISS.from_documents(all_splits, embeddings)
         vector_store.save_local(str(faiss_store))
         console.print(
@@ -81,7 +90,7 @@ def create_or_load_embeddings():
             f"Loading existing embeddings from {str(faiss_store)}", style="#C8A16D"
         )
         # embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-        embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+        # embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
         vector_store = FAISS.load_local(
             str(faiss_store), embeddings, allow_dangerous_deserialization=True
         )

@@ -1,7 +1,8 @@
 # python packages needed
 # Steps to create the virtual environment (using uv) [NOTE: $> represents command prompt!]
 #   $> cd folder/to/learning_langchain
-#   $> uv init venv . --python 3.12
+#   $> uv init .
+#   $> uv venv .venv --python 3.12
 #   $> source .venv/bin/activate  # For Linux/Mac
 #       -- OR --
 #   $> .venv\Scripts\activate     # For Windows
