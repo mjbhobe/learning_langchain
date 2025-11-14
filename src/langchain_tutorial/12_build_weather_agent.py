@@ -1,5 +1,6 @@
 import asyncio
-import os
+import os, sys
+from rich.console import Console
 from dotenv import load_dotenv
 from langchain_anthropic import ChatAnthropic
 from langchain.agents import AgentExecutor, create_react_agent
@@ -8,6 +9,7 @@ from langchain.tools import tool
 from pyowm import OWM
 
 load_dotenv(override=True)
+console = Console()
 
 # Initialize OpenWeatherMap client (has weather details for most major cities)
 # NOTE: you will need an OpenWeatherMap API key 
@@ -38,6 +40,8 @@ async def main():
 
     # Get the agent prompt from LangChain Hub
     prompt = hub.pull("hwchase17/react")
+    # console.print(prompt)
+    # sys.exit(-1)
 
     # Define the tools the agent can use
     tools = [get_current_weather]
