@@ -20,7 +20,9 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 # since we are using Gemini, we'll use Google embeddings
 # from langchain_google_genai import GoogleGenerativeAIEmbeddings
 # since we are using OpenAI we'll use OpenAI embeddings
-from langchain_openai import OpenAIEmbeddings
+#from langchain_openai import OpenAIEmbeddings
+# since we are using Cohere embeddings
+from langchain_cohere import CohereEmbeddings
 
 from langchain_community.vectorstores import FAISS
 
@@ -36,9 +38,15 @@ console = Console()
 
 
 # we'll use OpenAI gpt-4o-mini
-llm = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0.0)
-faiss_store = pathlib.Path(__file__).parent / "faiss_index_openai"
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+# llm = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0.0)
+# embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+# faiss_store = pathlib.Path(__file__).parent / "faiss_index_openai"
+
+
+# we'll use Anthropic's Claude Sonnect LLM, Cohere embeddings & FAISS vector DB
+llm = init_chat_model("claude-3-7-sonnet-20250219", model_provider="anthropic", temperature=0.0)
+embeddings = CohereEmbeddings(model="embed-english-v3.0")
+faiss_store = pathlib.Path(__file__).parent / "faiss_index_anthropic"
 
 
 def create_or_load_embeddings():
@@ -108,7 +116,8 @@ prompt_template = ChatPromptTemplate.from_messages(
             "system",
             "You are a helpful assistant. Read the question and scan the context provided and "
             "respond from the context only. If answer does not appear in the context respond "
-            "with an appropriate polite message, such as \"I'm sorry, I don't have that information.\"",
+            "with an appropriate polite message, such as \"I'm sorry, I don't have that information.\"."
+            "Don't add any other text to response, such as 'Based on the context provided...' etc.",
         ),
         (
             "user",
