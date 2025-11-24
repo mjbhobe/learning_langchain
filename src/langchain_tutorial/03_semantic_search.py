@@ -19,10 +19,12 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # since we are using Gemini, we'll use Google embeddings
 # from langchain_google_genai import GoogleGenerativeAIEmbeddings
+
 # since we are using OpenAI we'll use OpenAI embeddings
-#from langchain_openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
+
 # since we are using Cohere embeddings
-from langchain_cohere import CohereEmbeddings
+# from langchain_cohere import CohereEmbeddings
 
 from langchain_community.vectorstores import FAISS
 
@@ -31,22 +33,21 @@ load_dotenv(override=True)
 # for colorful text output
 console = Console()
 
-# we'll use Google Gemini Flash 2.0
-# llm = init_chat_model("google_genai:gemini-2.0-flash", temperature=0.0)
-# embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+# llm = init_chat_model("google_genai:gemini-2.5-flash", temperature=0.0)
+# embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", batch_size=65)
 # faiss_store = pathlib.Path(__file__).parent / "faiss_index_gemini"
 
 
 # we'll use OpenAI gpt-4o-mini
-# llm = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0.0)
-# embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-# faiss_store = pathlib.Path(__file__).parent / "faiss_index_openai"
+llm = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0.0)
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+faiss_store = pathlib.Path(__file__).parent / "faiss_index_openai"
 
 
 # we'll use Anthropic's Claude Sonnect LLM, Cohere embeddings & FAISS vector DB
-llm = init_chat_model("claude-3-7-sonnet-20250219", model_provider="anthropic", temperature=0.0)
-embeddings = CohereEmbeddings(model="embed-english-v3.0")
-faiss_store = pathlib.Path(__file__).parent / "faiss_index_anthropic"
+# llm = init_chat_model("claude-sonnet-4-5", model_provider="anthropic", temperature=0.0)
+# embeddings = CohereEmbeddings(model="embed-english-v3.0")
+# faiss_store = pathlib.Path(__file__).parent / "faiss_index_anthropic"
 
 
 def create_or_load_embeddings():
@@ -127,7 +128,6 @@ prompt_template = ChatPromptTemplate.from_messages(
     ],
 )
 
-
 query = ""
 while True:
     console.print(f"Your query? ", end="", style="#C8A16D")
@@ -148,7 +148,7 @@ while True:
     # display the similarity search results
     context = ""
     for i, result in enumerate(results):
-        console.print(Markdown(f"**Answer #{i+1}**: {result.page_content}"))
+        console.print(Markdown(f"**Answer #{i + 1}**: {result.page_content}"))
         console.print(f"Metadata: {result.metadata}\n")
         context += f"\n\n{result.page_content}"
 
