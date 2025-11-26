@@ -19,12 +19,12 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # since we are using Gemini, we'll use Google embeddings
 # from langchain_google_genai import GoogleGenerativeAIEmbeddings
+# I seem to have permanently exhausted rate limt on Google embeddings on free tier,
+# I don't want to enable billing, so am switching to Cohere embeddings
+from langchain_cohere import CohereEmbeddings
 
 # since we are using OpenAI we'll use OpenAI embeddings
-from langchain_openai import OpenAIEmbeddings
-
-# since we are using Cohere embeddings
-# from langchain_cohere import CohereEmbeddings
+# from langchain_openai import OpenAIEmbeddings
 
 from langchain_community.vectorstores import FAISS
 
@@ -33,15 +33,16 @@ load_dotenv(override=True)
 # for colorful text output
 console = Console()
 
-# llm = init_chat_model("google_genai:gemini-2.5-flash", temperature=0.0)
+llm = init_chat_model("google_genai:gemini-2.5-flash", temperature=0.0)
 # embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", batch_size=65)
-# faiss_store = pathlib.Path(__file__).parent / "faiss_index_gemini"
+embeddings = CohereEmbeddings(model="embed-english-v3.0")
+faiss_store = pathlib.Path(__file__).parent / "faiss_index_gemini_cohere"
 
 
 # we'll use OpenAI gpt-4o-mini
-llm = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0.0)
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-faiss_store = pathlib.Path(__file__).parent / "faiss_index_openai"
+# llm = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0.0)
+# embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+# faiss_store = pathlib.Path(__file__).parent / "faiss_index_openai"
 
 
 # we'll use Anthropic's Claude Sonnect LLM, Cohere embeddings & FAISS vector DB
@@ -86,8 +87,6 @@ def create_or_load_embeddings():
         # save to embeddings
 
         console.print("Creating embeddings. Please wait...", style="#C8A16D")
-        # embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-        # embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
         vector_store = FAISS.from_documents(all_splits, embeddings)
         vector_store.save_local(str(faiss_store))
         console.print(
@@ -98,8 +97,6 @@ def create_or_load_embeddings():
         console.print(
             f"Loading existing embeddings from {str(faiss_store)}", style="#C8A16D"
         )
-        # embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-        # embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
         vector_store = FAISS.load_local(
             str(faiss_store), embeddings, allow_dangerous_deserialization=True
         )
