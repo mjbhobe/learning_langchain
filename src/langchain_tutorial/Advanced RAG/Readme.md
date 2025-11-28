@@ -34,7 +34,7 @@ It consists of a few different sections. Going from left-to-right, we have:
 6. **Generation**: which consists of an interesting new set of methods to do what we might call as _active RAG_, which are techiques to grade documents, grade answers, grade for relevance of the question, grade for faithfulness to the documents (i.e. check for hallucinations), and if either fail feedback, re-retrieve or re-write the question, re-generate the answer and so forth.
 
 Here are the set of applicable notebooks:
-1. [01-Indexing Retrieval Generation](01-Indexing_Retrieval_Generation.ipynb) : bare-bones or naieve RAG technique.
+1. [01-Indexing Retrieval Generation](01-Indexing_Retrieval_Generation.ipynb) : bare-bones or naive RAG technique.
 2. [02-Query Transformations](02-Query_Transformations.ipynb)
 3. [03-Routing](03-Routing.ipynb)
 4. [04-Query Construction](04-Query_Construction.ipynb)
