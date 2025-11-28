@@ -12,10 +12,10 @@ body {
 /* code listings */
 code {
     font-family:
-        /* macOS 10.10+ */
-        SF Mono,
         /* Windows 6+ */
         Consolas,
+        /* macOS 10.10+ */
+        SF Mono,
         /* Android 4+ */
         Roboto Mono,
         /* Ubuntu 10.10+ */
@@ -33,10 +33,10 @@ code {
 
 pre * {
     font-family:
-        /* macOS 10.10+ */
-        SF Mono,
         /* Windows 6+ */
         Consolas,
+        /* macOS 10.10+ */
+        SF Mono,
         /* Android 4+ */
         Roboto Mono,
         /* Ubuntu 10.10+ */
