@@ -5,7 +5,8 @@
     LLM, including open source LLMs, of your choice.
 
 @author: Manish Bhobé
-My experiments with AI/Gen AI. Code shared for learning purposes only.
+My experiments with AI/Gen AI. Code shared for learning purposes only. :w
+
 Use at your own risk!!
 """
 

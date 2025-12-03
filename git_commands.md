@@ -13,7 +13,12 @@ $> sudo apt-get install git
 $> sudo pacman -Syu
 $> sudo pacman -S git
 ```
-* After successful install, you **must** configure your user-name and email-ID
+* To check if `git` is installed on your system, run the following command from a command shell. It should show you the version, confirming that git is installed on your system.
+```bash
+$> git --version
+git version 2.48.1.windows.1
+```
+* After successful install, you **must** configure your user-name and email-ID. Run the following from a command shell.
 ```bash
 $> git config --global user.name "First Last"
 $> git config --global user.email "Email@domain.com"
@@ -21,7 +26,7 @@ $> git config --global user.email "Email@domain.com"
 
 ## Some basic terms
 * **Git Repository**: A local directory with a `.git` folder where all the contents are tracked for changes.
-* **Remote*: A server where all the code repos are saved (for example `GitHub` or `Gitlab`)
+* **Remote**: A server where all the code repos are saved (for example `GitHub` or `Gitlab`)
 * **Commit**: Similar to a version. When you make changes in a file, you need to **commit the changes** in
 
 ## Linking Local Folder to Remote Git Repo
@@ -57,30 +62,34 @@ $> git pull origin main --allow-unrelated-histories
 
 That's it - this will _connect_ your _local_ folder to the _remote Git repo_!
 
-### Versioning local files
+## Versioning local files
 The following commands to be run every time you add new files or edit/change existing ones. 
 
 **Run these commands from command line in the sequence shown**. As before, the `$>` represents the command prompt & should NOT be typed. The line beginning with `#` is a comment explaining what the _previous_ command does and should NOT be typed.
 
 ```bash
 $> git add -A  
-# same as "Stage all changes" in VS Code
-
+# same as "Stage all changes" in VS Code (all new files, all modifications and all deletions)
+        OR
+$> git add file_name
+# to add just 1 file to git
+```
+```bash
 $> git commit -m "<<your commit comment>>" 
 # same as "Commit Staged" in VS Code (replace <<your commit comments>> with appropriate commit comments)
 
-$> git pull  OR git pull origin main  
+$> git pull OR git pull origin main  
 # pull all remote changes (optional)
 
 $> git push origin main 
 # push all committed changes to remote repo
 ```
 
-**NOTE:** if your main branch was called something other than _main_ (for example _master_), then replace `main` with `master` in the last command above.
+**NOTE:** if your main branch was called something other than _main_ (for example _master_), then replace `main` with `master` in the commands above.
 
 ## Some common Git Commands
 | Command       | Explanation              |
-|:--------------:|:------------------------|
+|:--------------|:------------------------|
 |`git clone <git_repo_url>` | Get the complete project from remote Git URL to local machine |
 |`git pull origin <branch_name>` | Get the new changes from remote branch to local branch |
 |`git push origin <branch_name>` | Send your local branch changes to remote branch |
