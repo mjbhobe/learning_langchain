@@ -6,6 +6,48 @@ I have used `uv` to manage the Python environment for this project. Here are the
 
 Before re-creating the Python environment, ensure you have `uv` installed on your local machine. To install `uv` for your operating system, follow the instructions [here](https://docs.astral.sh/uv/)
 
+### Initializing a new managed environment
+This step is applicable when you are creating a new Python environment that will be managed by `uv`. **Skip this step if you have cloned this repo from GitHub. In that case, skip this step and jump to the next section**. We'll assume that your project is located in a folder `~/code/my_project` and its subfolders. Let's refer to this folder as the `Project Folder`.
+
+1. Change directory to the `Project Folder`
+    ```bash
+    $> cd ~/code/my_project
+    ```
+2. Run the following command inside the `Project Folder` - this creates a local Python environment in the `Project Folder/.venv`, but _does not_ install any Python packages!
+    ```bash
+    $> uv venv --python 3.12
+    ```
+    Here we have chosen to use Python 3.12 (with the `--python 3.12` option). You can choose any other version of Python that you want to use for your project (replace `3.12` with `3.10` to use Python 3.10, for example).
+3. Initialize the new managed environment
+    ```bash
+    $> uv init
+    ```
+    This will create a `pyproject.toml` file in the `Project Folder`. This file will be used by `uv` to manage the Python environment and help your replicate the same environment across various machines.
+4. Activate the local environment you just created
+    ```bash
+    $> source .venv/Scripts/activate  ## on a Mac/Linux
+
+    $> .venv\Scripts\activate ## on Windows
+    ```
+5. Add packages to the local environment
+    ```bash
+    $> uv add <package_name>
+    ```
+    For example:
+    ```bash
+    $> uv add langchain
+    ```
+    You can add multiple packages at once as follows:
+    ```bash
+    $> uv add langchain openai python-dotenv ....
+    # each package should be separated by a space
+    ```
+    As a best practice, you should add the packages to a `requirements.txt` file and then add all packages from that file using the following command:
+    ```bash
+    $> uv add -r requirements.txt
+    ```
+    `requirements.txt` is just a regular text file with one package listed per line (as was the case used with `pip`)
+
 ### Recreating the Python environment
 These are the steps to setup the Python environment (**NOTE**: in the code listings below `$>` refers to the command prompt and should not be entered by you!)
 1. `cd` to folder where you pulled the Github repo - let's refer to this folder as `$PROJECT_HOME` henceforth
