@@ -27,9 +27,9 @@ These are the steps to setup the Python environment (**NOTE**: in the code listi
     ```
 4. Recreate the environmant - will install the packages from `pyproject.toml` file
 
-        ```bash
-        $> uv sync
-        ```
+    ```bash
+    $> uv sync
+    ```
 5. Install some _global_ packages - these will be installed globally without _polluting_ your local Python environment. The include packages such as `ipykernel` (to run Notebook files) and `black` (to format Python code)
     ```bash
     $> uv tool install black 
