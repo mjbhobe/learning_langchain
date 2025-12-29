@@ -5,10 +5,16 @@ runnables_and_chains.py - exploring LangChain's runnables & chains
 My experiments with LangChain on the GCP. Code is shared for learning purposes only!
 """
 import random
+from rich.console import Console
+import langchain
 from langchain_core.runnables import RunnableLambda
 
 SEED = 41
 random.seed(SEED)
+console = Console() # for colorful text on console
+
+console.print(f"[red]Using Langchain:[/red] {langchain.__version__}")
+
 
 # base class for all LangChain classes is Runnable, which has an invoke() method
 # apart from others such as stream() and batch()
@@ -16,8 +22,8 @@ random.seed(SEED)
 # A RunnableLambda is a class that makes any Python function/lambda a Runnable object
 
 runnable = RunnableLambda(lambda x: x + 1)
-print(f"runnable.invoke(1) = {runnable.invoke(1)}")
-print(f"runnable.invoke(2) = {runnable.invoke(2)}")
+console.print(f"[sky_blue1]runnable.invoke(1) = [/sky_blue1] {runnable.invoke(1)}")
+console.print(f"[sky_blue1]runnable.invoke(2) = [/sky_blue1] {runnable.invoke(2)}")
 
 # runnables can be chained together into a chain, which itself is a runnable
 def get_radius() -> int:
@@ -37,4 +43,4 @@ chain = (
 
 # NOTE: the invoke() function requires a parameter!
 response = chain.invoke(None)
-print(f"Response of chain -> {response}")
+console.print(f"[sky_blue1]Response of chain ->[/sky_blue1] {response}")
