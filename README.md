@@ -54,17 +54,21 @@ These are the steps to setup the Python environment (**NOTE**: in the code listi
     ```bash
     $> cd folder/to/learning_langchain
     ```
-2. Run the following command inside `$PROJECT_HOME` - - this  creates a local Python environment in the `$PROJECT_HOME/.venv`, but _does not_ install any Python packages!
+2. Run the following command inside `$PROJECT_HOME` - - this  creates a local Python environment in the `$PROJECT_HOME/.venv`, but _does not_ install any Python packages! It also creates a `pyproject.toml` file, which uv will update.
     ```bash
-    $> uv venv --python 3.12
+    $> uv venv --python 3.12 .venv
     ```
 3. Activate the Python environment you just created
     ```bash
-    $> source .venv/Scripts/activate  ## on a Mac/Linux
+    $> source .venv/bin/activate  ## on a Mac/Linux
 
-    $> .venv\Scripts\activate ## on Windows
+    # For Windows users (PowerShell):
+    # .venv\Scripts\Activate.ps1
+    # For Windows users (Command Prompt):
+    # .venv\Scripts\activate.bat
     ```
 4. Recreate the environmant - will install the packages from `pyproject.toml` file
+
     ```bash
     $> uv sync
     ```
