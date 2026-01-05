@@ -18,7 +18,7 @@ _ = load_dotenv(find_dotenv())  # read local .env file
 
 # create our model
 llm = ChatGoogleGenerativeAI(
-    model="gemini-pro", google_api_key=os.environ["GOOGLE_API_KEY"]
+    model="gemini-pro", google_api_key=os.environ["GOOGLE_API_KEY"])
 
 # and our prompt
 tweet_prompt = PromptTemplate.from_template(
