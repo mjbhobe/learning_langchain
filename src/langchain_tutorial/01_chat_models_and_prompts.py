@@ -20,9 +20,10 @@ load_dotenv(override=True)
 console = Console()
 
 # following line is using Google Gemini
-llm = init_chat_model("google_genai:gemini-2.0-flash", temperature=0.0)
+# llm = init_chat_model("google_genai:gemini-2.0-flash", temperature=0.0)
 # following line is for OpenAI
 # llm = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0.0)
+llm = init_chat_model("claude-haiku-4-5", model_provider="anthropic", temperature=0.0)
 
 system_message: str = "Translate the following from English into Italian"
 human_message: str = "Wassup dude!! Welcome to LangChain"
