@@ -34,6 +34,7 @@ yfinance
 uvicorn
 rich
 wikipedia
+tavily
 
 # langchain common modules
 langchain
