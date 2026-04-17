@@ -1,8 +1,11 @@
 # LangChain Foundation
 
-This course introduces you to how you can build Agents using LangChain. The term AI Agents.
+This course introduces you to how you can build Agents using the LangChain framework. It progressively introduces you to all the Agent related features provided by LangChain:
+* [Module1](Module1/readme.md) - covers the basic features such as creating a basic agent, adding system prompts, tools, memory and multi-modal inputs. It concludes with an interesting personal chef application that applies all the techniques learnt in this module.
+* Module2 - we jump to more advanced concepts such as the Model Context protocol (MCP) << to do>>
+* Module3 - << to do>>
 
-Here are instructions on how to setup your local environment. I'll be using `uv` to manage my local environment and Python >=3.12.
+Here are instructions on how to setup your local environment. We'll be using `uv` to manage my local environment and Python >=3.12.
 
 ## Installation
 Download this repo from `git` using the following command:
