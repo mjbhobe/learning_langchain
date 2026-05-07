@@ -74,3 +74,5 @@ Here are the set of applicable notebooks:
 5. [05-Indexing](05-Indexing.ipynb)
 6. [06-Retrieval](06-Retrival.ipynb)
 7. [07-Generation](07-Generation.ipynb)
+
+This series is based on an online course [RAG from Scratch by Lance Martin from LangChain](https://www.youtube.com/watch?v=sVcwVQRHIc8&list=PLbM_IDvvYBgl4sMe4Zrv4mGF9Et8LQisG&index=5).
