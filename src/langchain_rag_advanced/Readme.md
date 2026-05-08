@@ -2,24 +2,17 @@
 
 RAG of Retrieval Augmented Generation is one of the most popular applications in Generative AI.
 
-The motivation behind RAG is that most of the world's data is private, whereas LLMs are trained on publicly available
-data. So they can easily answer question on public data, such as _"Tell me about Sachin Tendulkar"_. However they have
-no knowledge about your private/confidential data, such as your business proposals to customer X. So an LLM will
-struggle to answer a question such as "what type of staffing model did we propose to customer X for their Insurance UW
+The motivation behind RAG is that most of the world's data is private, whereas LLMs are trained on publicly available data. So they can easily answer question on public data, such as _"Tell me about Sachin Tendulkar"_. However they have
+no knowledge about your private/confidential data, such as your business proposals to customer X. So an LLM will struggle to answer a question such as "what type of staffing model did we propose to customer X for their Insurance UW
 proposal?".
 
-Also LLM's have a _training cutoff_, meaning they are trained with data upto a certain point in time, such as Sept 2023.
-It will therefore struggle to answer questions on more recent events too - such as "Who won the ICC T20 men's trophy in
+Also LLM's have a _training cutoff_, meaning they are trained with data upto a certain point in time, such as Sept 2023.  It will therefore struggle to answer questions on more recent events too - such as "Who won the ICC T20 men's trophy in
 2025?"
 
-What's really interesting with modern LLMs, such as Google Gemini or Anthropic Claude or OpenAI GPT is that the size of
-their context window (or the ability to feed data _into_ these models) is getting larger and larger (From 4-8K tokens (~
-12 pages of text) to ~1 Mn tokens, which is approximately 1000 of pages of text!). This is making it increasingly
-feasible to feed a huge mass of external private data to an LLM - something it has never seen; could be your own
-corporate data for example (or any other information not in its native training set) - and the LLM can answer question
-from that
-data (or _context_) - this is also referred to _grounding LLM response in context_. This is the main motivation around
-RAG.
+What's really interesting with modern LLMs, such as Google Gemini, Anthropic Claude or OpenAI GPT is that the size of their context window (or the ability to feed data _into_ these models) is getting larger and larger (From 4-8K tokens (~
+12 pages of text) to ~1 Mn tokens, which is approximately 1000 of pages of text!). This is making it increasingly feasible to feed a huge mass of external private data to an LLM - something it has never seen; could be your own
+corporate data for example (or any other information not in its native training set) - and the LLM can answer question from that
+data (or _context_) - this is also referred to _grounding LLM response in context_. 
 
 This is the motivation behind RAG:
 
@@ -28,14 +21,11 @@ This is the motivation behind RAG:
 
 You can think of RAG as 3 very general steps as shown in the figure below:
 
-![RAG Pipeline](../images/rag_pipeline.png)
+![RAG Pipeline](images/rag_pipeline.png)
 
-1. There is the process of _Indexing_ of external data. You can think about this as building a database of sorts. Many
-   companies already have large database in various forms - RDBMs, NoSQL DBs, vector stores or otherwise.
-2. The point is that documents are indexed such that they can be retrieved based on some hueristics relative to an
-   input, like a question (_Retrieval_).
-3. Those documents can then be passed to an LLM (as a context), which can produced answers that can be grounded in that
-   context (_Generation_).
+1. There is the process of _Indexing_ of external data. You can think about this as building a database of sorts. Many companies already have large database in various forms - RDBMs, NoSQL DBs, vector stores or otherwise.
+2. The point is that documents are indexed such that they can be retrieved based on some hueristics relative to an input, like a question (_Retrieval_).
+3. Those documents can then be passed to an LLM (as a context), which can produced answers that can be grounded in that context (_Generation_).
 
 This is the central idea behind RAG and why it is such a powerful technology - it _unites_ the analysis capability of
 LLMs with large private sources of data.
@@ -43,7 +33,7 @@ LLMs with large private sources of data.
 However, RAG is much more involved that the _simple_ process illustrated above. In this set of notebooks, we'll cover
 all the finer aspects of RAG as shown in the image below:
 
-![RAG Full Pipeline](../images/rag_detailed_pipeline.png)
+![RAG Full Pipeline](images/rag_detailed_pipeline.png)
 
 It consists of a few different sections. Going from left-to-right, we have:
 
@@ -67,8 +57,8 @@ It consists of a few different sections. Going from left-to-right, we have:
 
 Here are the set of applicable notebooks:
 
-1. [01-Indexing Retrieval Generation](01-Indexing_Retrieval_Generation.ipynb) : bare-bones or naive RAG technique.
-2. [02-Query Transformations](02-Query_Transformations.ipynb)
+1. [01-Naive RAG](01_Naive_RAG.ipynb) : the Naive RAG Pipeline.
+2. [02-Query Translation](02_Query_Translation.ipynb): covers techniques like Multi-Query, RAG Fusion, Query Decomposition, Step-Back Prompting and HYDE.
 3. [03-Routing](03-Routing.ipynb)
 4. [04-Query Construction](04-Query_Construction.ipynb)
 5. [05-Indexing](05-Indexing.ipynb)
