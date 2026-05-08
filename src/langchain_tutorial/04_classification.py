@@ -20,13 +20,16 @@ load_dotenv(override=True)
 console = Console()
 
 # create our LLM - we'll be using Gemini-2.5-flash
-llm = init_chat_model("google_genai:gemini-2.5-flash", temperature=0.0)
+# llm = init_chat_model("google_genai:gemini-2.5-flash", temperature=0.0)
 
 # create our LLM - we'll be using Anthropic's Claude-Sonnet 3.7
 # llm = init_chat_model("claude-3-7-sonnet-20250219", model_provider="anthropic")
 
+# create our LLM - we'll use OpenAI gpt-5-nano
+llm = init_chat_model("gpt-5-nano", model_provider="openai", temperature=0.0)
+
 # in this example, we'll provide the model with some text and ask it to
-# determine the sentimentaggressiveness and language of the text provided.
+# determine the sentiment-aggressiveness and language of the text provided.
 # A trick is to use a Pydantic model to define the structured output that
 # can capture all these attributes we are looking to extract.
 
@@ -61,16 +64,14 @@ class Classification(BaseModel):
 structured_llm = llm.with_structured_output(Classification)
 
 # Step 3: define our prompt for extraction of the structured output
-prompt_template = ChatPromptTemplate.from_template(
-    """
+prompt_template = ChatPromptTemplate.from_template("""
 Extract the desired information from the following passage.
 
 Only extract the properties mentioned in the 'Classification' function.
 
 Passage:
 {user_input}
-"""
-)
+""")
 
 # Step 4: Ask away
 while True:
