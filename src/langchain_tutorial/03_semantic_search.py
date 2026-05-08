@@ -21,39 +21,42 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 # from langchain_google_genai import GoogleGenerativeAIEmbeddings
 # I seem to have permanently exhausted rate limt on Google embeddings on free tier,
 # I don't want to enable billing, so am switching to Cohere embeddings
-from langchain_cohere import CohereEmbeddings
+# from langchain_cohere import CohereEmbeddings
 
 # since we are using OpenAI we'll use OpenAI embeddings
-# from langchain_openai import OpenAIEmbeddings
+from langchain_openai import OpenAI, OpenAIEmbeddings
 
-from langchain_community.vectorstores import FAISS
+# and we'll be using Chroma embeddings
+from langchain_community.vectorstores import Chroma
 
 # load API keys from .env files
 load_dotenv(override=True)
 # for colorful text output
 console = Console()
 
-llm = init_chat_model("google_genai:gemini-2.5-flash", temperature=0.0)
+# llm = init_chat_model("google_genai:gemini-2.5-flash", temperature=0.0)
 # embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", batch_size=65)
-embeddings = CohereEmbeddings(model="embed-english-v3.0")
-faiss_store = pathlib.Path(__file__).parent / "faiss_index_gemini_cohere"
-
+# embeddings = CohereEmbeddings(model="embed-english-v3.0")
+# vector_store = pathlib.Path(__file__).parent / "faiss_index_gemini_cohere"
 
 # we'll use OpenAI gpt-4o-mini
-# llm = init_chat_model("gpt-4o-mini", model_provider="openai", temperature=0.0)
-# embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+llm = init_chat_model("gpt-5-nano", model_provider="openai", temperature=0.0)
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+vector_store = pathlib.Path(__file__).parent / "chroma_db/chroma_index_openai"
 # faiss_store = pathlib.Path(__file__).parent / "faiss_index_openai"
 
 
 # we'll use Anthropic's Claude Sonnect LLM, Cohere embeddings & FAISS vector DB
 # llm = init_chat_model("claude-sonnet-4-5", model_provider="anthropic", temperature=0.0)
 # embeddings = CohereEmbeddings(model="embed-english-v3.0")
-# faiss_store = pathlib.Path(__file__).parent / "faiss_index_anthropic"
+# vector_store = pathlib.Path(__file__).parent / "faiss_index_anthropic"
 
 
-def create_or_load_embeddings():
-    """creates if not available or loads from disk a FAISS embedding"""
-    if not faiss_store.exists():
+def create_or_load_embeddings(
+    embeddings, chroma_store, chunk_size=300, chunk_overlap=50
+):
+    """creates if not available or loads from disk a Chroma DB vector store"""
+    if not chroma_store.exists():
         # load the PDF into memory
         pdf_path = pathlib.Path(__file__).parent / "docs" / "nike-10k-2023.pdf"
         console.print(
@@ -75,11 +78,9 @@ def create_or_load_embeddings():
 
         # split PDF into chunks of 1000 chars with 200 chars overlap
         console.print(f"Chunking the PDF. Please wait...", style="#C8A16D")
-        chunk_size: int = 1000
-        overlap: int = 200
 
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=chunk_size, chunk_overlap=overlap
+            chunk_size=chunk_size, chunk_overlap=chunk_overlap
         )
         all_splits = text_splitter.split_documents(docs)
         console.print(f"Created {len(all_splits)} chunks")
@@ -87,23 +88,29 @@ def create_or_load_embeddings():
         # save to embeddings
 
         console.print("Creating embeddings. Please wait...", style="#C8A16D")
-        vector_store = FAISS.from_documents(all_splits, embeddings)
-        vector_store.save_local(str(faiss_store))
+        vector_store = Chroma.from_documents(
+            documents=all_splits,
+            embedding=embeddings,
+            persist_directory=str(chroma_store),
+        )
+        # retriever = vector_store.as_retriever()
         console.print(
-            f"Local embeddings created at {str(faiss_store)}",
-            style="#C8A16D",
+            f"[yellow]Local embeddings created at {str(chroma_store)}[/yellow]"
         )
     else:
         console.print(
             f"Loading existing embeddings from {str(faiss_store)}", style="#C8A16D"
         )
-        vector_store = FAISS.load_local(
-            str(faiss_store), embeddings, allow_dangerous_deserialization=True
+        vector_store = Chroma(
+            embedding_function=embeddings,
+            persist_directory=str(chroma_store),
         )
+        retriever = vector_store.as_retriever()
+
     return vector_store
 
 
-vector_store = create_or_load_embeddings()
+vector_store = create_or_load_embeddings(embeddings, vector_store)
 
 # now ask the LLM to respond
 from langchain_core.prompts import ChatPromptTemplate
