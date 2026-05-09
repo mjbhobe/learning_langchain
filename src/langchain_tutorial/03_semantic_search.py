@@ -17,16 +17,10 @@ from langchain.chat_models import init_chat_model
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-# since we are using Gemini, we'll use Google embeddings
-# from langchain_google_genai import GoogleGenerativeAIEmbeddings
-# I seem to have permanently exhausted rate limt on Google embeddings on free tier,
-# I don't want to enable billing, so am switching to Cohere embeddings
-# from langchain_cohere import CohereEmbeddings
-
-# since we are using OpenAI we'll use OpenAI embeddings
+# In this example we'll be using OpenAI LLM and it's corresponding embeddings
 from langchain_openai import OpenAI, OpenAIEmbeddings
 
-# and we'll be using Chroma embeddings
+# and we'll be using Chroma vector store
 from langchain_community.vectorstores import Chroma
 
 # load API keys from .env files
@@ -34,30 +28,20 @@ load_dotenv(override=True)
 # for colorful text output
 console = Console()
 
-# llm = init_chat_model("google_genai:gemini-2.5-flash", temperature=0.0)
-# embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", batch_size=65)
-# embeddings = CohereEmbeddings(model="embed-english-v3.0")
-# vector_store = pathlib.Path(__file__).parent / "faiss_index_gemini_cohere"
-
-# we'll use OpenAI gpt-4o-mini
+# define our LLM, embeddings and vector_store
 llm = init_chat_model("gpt-5-nano", model_provider="openai", temperature=0.0)
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 vector_store = pathlib.Path(__file__).parent / "chroma_db/chroma_index_openai"
-# faiss_store = pathlib.Path(__file__).parent / "faiss_index_openai"
-
-
-# we'll use Anthropic's Claude Sonnect LLM, Cohere embeddings & FAISS vector DB
-# llm = init_chat_model("claude-sonnet-4-5", model_provider="anthropic", temperature=0.0)
-# embeddings = CohereEmbeddings(model="embed-english-v3.0")
-# vector_store = pathlib.Path(__file__).parent / "faiss_index_anthropic"
 
 
 def create_or_load_embeddings(
     embeddings, chroma_store, chunk_size=300, chunk_overlap=50
 ):
-    """creates if not available or loads from disk a Chroma DB vector store"""
+    """utility function to create (if not available) or load embeddings"""
     if not chroma_store.exists():
-        # load the PDF into memory
+        # create embeddings db as I could not find it
+
+        # Step 1: load the PDF into memory
         pdf_path = pathlib.Path(__file__).parent / "docs" / "nike-10k-2023.pdf"
         console.print(
             f"Loading the PDF {str(pdf_path)}. Please wait...",
@@ -76,7 +60,7 @@ def create_or_load_embeddings(
             style="#6C95EB",
         )
 
-        # split PDF into chunks of 1000 chars with 200 chars overlap
+        # Step 2: split PDF into chunks
         console.print(f"Chunking the PDF. Please wait...", style="#C8A16D")
 
         text_splitter = RecursiveCharacterTextSplitter(
@@ -85,8 +69,7 @@ def create_or_load_embeddings(
         all_splits = text_splitter.split_documents(docs)
         console.print(f"Created {len(all_splits)} chunks")
 
-        # save to embeddings
-
+        # save embeddings to our vectors store on disk
         console.print("Creating embeddings. Please wait...", style="#C8A16D")
         vector_store = Chroma.from_documents(
             documents=all_splits,
@@ -98,6 +81,7 @@ def create_or_load_embeddings(
             f"[yellow]Local embeddings created at {str(chroma_store)}[/yellow]"
         )
     else:
+        # found a previous vector_store on disk, load it and return instance
         console.print(
             f"Loading existing embeddings from {str(faiss_store)}", style="#C8A16D"
         )
@@ -105,7 +89,7 @@ def create_or_load_embeddings(
             embedding_function=embeddings,
             persist_directory=str(chroma_store),
         )
-        retriever = vector_store.as_retriever()
+        # retriever = vector_store.as_retriever()
 
     return vector_store
 
@@ -145,17 +129,21 @@ while True:
         console.print("[red]Exiting application. Bye![/red]")
         break
 
-    # get the context for the query from the documents
+    # get the nearest N similar contexts from the vector store
+    # with a similarity search -- this will form our context
     results = vector_store.similarity_search(query)
     console.print(f"Query: {query}")
     console.print(f"Found {len(results)} results ", style="#85C46C")
-    # display the similarity search results
+
+    # display the similarity search results, for our reference
+    # this is the context that LLM uses to generate final response
     context = ""
     for i, result in enumerate(results):
-        console.print(Markdown(f"**Answer #{i + 1}**: {result.page_content}"))
+        console.print(Markdown(f"**Context #{i + 1}**: {result.page_content}"))
         console.print(f"Metadata: {result.metadata}\n")
         context += f"\n\n{result.page_content}"
 
+    # feed context & question to LLM to generate final response
     prompt = prompt_template.invoke({"context": context, "question": query})
     response = llm.invoke(prompt)
     md = Markdown(dedent(response.content))

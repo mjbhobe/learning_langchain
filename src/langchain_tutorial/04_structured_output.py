@@ -21,11 +21,8 @@ load_dotenv(override=True)
 # for colorful text output
 console = Console()
 
-# create our LLM - we'll be using Gemini-2.5-flash
-# llm = init_chat_model("google_genai:gemini-2.5-flash", temperature=0.0)
-
-# create our LLM - we'll be using Anthropic's Claude-Sonnet 3.7
-llm = init_chat_model("claude-3-7-sonnet-20250219", model_provider="anthropic")
+# create our LLM - we'll use OpenAI gpt-5-nano
+llm = init_chat_model("gpt-5-nano", model_provider="openai", temperature=0.0)
 
 # in this example, we will use tool-calling features of chat models to
 # extract structured information from unstructured text. We will also demonstrate

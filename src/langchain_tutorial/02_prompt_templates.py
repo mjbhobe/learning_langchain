@@ -3,9 +3,6 @@
     that helps you translate any user input from English to any language
     user specifies.
 
-    We'll be using Google Gemini Flash 2.x model in this series, but you
-    can you any LLM, including open source LLMs, of your choice.
-
 @author: Manish Bhobé
 My experiments with AI/Gen AI. Code shared for learning purposes only.
 Use at your own risk!!
@@ -21,11 +18,20 @@ load_dotenv(override=True)
 console = Console()
 
 
-# llm = init_chat_model("google_genai:gemini-2.5-flash", temperature=0.0)
+# ---- uncomment one of the following lines for your preferred LLM ------------------
 
-# we'll use OpenAI gpt-4o-mini
+# following line is using Google Gemini
+# llm = init_chat_model("google_genai:gemini-2.0-flash", temperature=0.0)
+
+# following line is for OpenAI
 llm = init_chat_model("gpt-5-nano", model_provider="openai", temperature=0.0)
 
+# following line is for Anthropic Claude Haiku
+# llm = init_chat_model("claude-haiku-4-5", model_provider="anthropic", temperature=0.0)
+
+# ------------------------------------------------------------------------------------
+
+# here 'language' is a parameter we'll ask the user to provide
 system_message: str = "Translate the following from English into {language}"
 
 # create our prompt template - note that we have 2 variables
@@ -33,11 +39,13 @@ system_message: str = "Translate the following from English into {language}"
 prompt_template = ChatPromptTemplate.from_messages(
     [("system", system_message), ("user", "{user_input}")]
 )
+
 # get inputs from the user
 console.print("[green]Sentence to translate: [/green]", end="")
 user_input = input()
 console.print("[green]Language to translate to: [/green]", end="")
 language_input = input()
+
 # build the prompt (fill in the variable values we inputted from user)
 prompt = prompt_template.invoke({"language": language_input, "user_input": user_input})
 console.print(f"[blue]Prompt: [/blue]{prompt}")

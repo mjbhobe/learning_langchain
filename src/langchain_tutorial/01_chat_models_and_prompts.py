@@ -2,9 +2,6 @@
 01_chat_models_and_prompts.py - calling an LLM with Langchain and System
     and Human messages, without a prompt template.
 
-    We'll be using the Google Gemini Flash 2.x model in this series,
-    but you can you any LLM, including open source LLMs, of your choice.
-
 @author: Manish Bhobé
 My experiments with AI/Gen AI. Code shared for learning purposes only. :w
 
@@ -20,11 +17,18 @@ from langchain_core.messages import HumanMessage, SystemMessage
 load_dotenv(override=True)
 console = Console()
 
+# ---- uncomment one of the following lines for your preferred LLM ------------------
+
 # following line is using Google Gemini
 # llm = init_chat_model("google_genai:gemini-2.0-flash", temperature=0.0)
+
 # following line is for OpenAI
 llm = init_chat_model("gpt-5-nano", model_provider="openai", temperature=0.0)
+
+# following line is for Anthropic Claude Haiku
 # llm = init_chat_model("claude-haiku-4-5", model_provider="anthropic", temperature=0.0)
+
+# ------------------------------------------------------------------------------------
 
 system_message: str = "Translate the following from English into Italian"
 human_message: str = "Wassup dude!! Welcome to LangChain"
