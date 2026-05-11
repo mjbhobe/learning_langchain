@@ -6,21 +6,26 @@ My experiments with AI/Gen AI. Code shared for learning purposes only.
 Use at your own risk!!
 """
 
-import bs4, sys
+import bs4, sys, os
 import pathlib
 from dotenv import load_dotenv
 from typing import List, TypedDict
 from rich.console import Console
 from rich.markdown import Markdown
 
+# set USER_AGENT global
+os.environ["USER_AGENT"] = "LangChainTut_RAG1Doc/1.0"
+
+# In this example we'll be using OpenAI LLM and it's corresponding embeddings
+from langchain_openai import OpenAI, OpenAIEmbeddings
+
+# and we'll be using Chroma vector store
+from langchain_community.vectorstores import Chroma
+
 from langchain.chat_models import init_chat_model
 from langchain_core.documents import Document
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-# since we are using Gemini, we'll use Google embeddings
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_community.vectorstores import FAISS
 
 from langgraph.graph import StateGraph, START, END
 
@@ -29,14 +34,18 @@ load_dotenv(override=True)
 # for colorful text output
 console = Console()
 
-# create our LLM - we'll be using Gemini-2.5-flash
-llm = init_chat_model("google_genai:gemini-2.5-flash", temperature=0.0)
-faiss_store = pathlib.Path(__file__).parent / "faiss_index_rag1"
+# define our LLM, embeddings and vector_store
+llm = init_chat_model("gpt-5-nano", model_provider="openai", temperature=0.0)
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+vector_store = pathlib.Path(__file__).parent / "chroma_db/lilianweng"
 
 
-def create_or_load_embeddings():
-    """creates if not available or loads from disk a FAISS embedding"""
-    if not faiss_store.exists():
+def create_or_load_embeddings(
+    embeddings, chroma_store, chunk_size=300, chunk_overlap=50
+):
+    """utility function to create (if not available) or load embeddings"""
+    if not chroma_store.exists():
+        # create embeddings db as I could not find it
         # in this example we'll load document from a URL
         web_url = "https://lilianweng.github.io/posts/2023-06-23-agent/"
         console.print(
@@ -61,35 +70,40 @@ def create_or_load_embeddings():
         # split document into chunks of 1000 chars with 200 chars overlap
         console.print(f"[yellow]Chunking the PDF. Please wait...[/yellow]")
 
-        text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
-            chunk_size=300,
-            chunk_overlap=50,
-            # add_start_index=True,  # track index in original documen
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size, chunk_overlap=chunk_overlap
         )
         all_splits = text_splitter.split_documents(docs)
-        console.print(f"[blue]Created {len(all_splits)} chunks[/blue]")
+        console.print(f"Created {len(all_splits)} chunks")
 
         # save to embeddings
 
-        console.print("[yellow]Creating embeddings. Please wait...[/yellow]")
-        embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-        vector_store = FAISS.from_documents(all_splits, embeddings)
-        vector_store.save_local(str(faiss_store))
+        # save embeddings to our vectors store on disk
+        console.print("Creating embeddings. Please wait...", style="#C8A16D")
+        vector_store = Chroma.from_documents(
+            documents=all_splits,
+            embedding=embeddings,
+            persist_directory=str(chroma_store),
+        )
+        # retriever = vector_store.as_retriever()
         console.print(
-            f"[yellow]Local embeddings created at {str(faiss_store)}[/yellow]"
+            f"[yellow]Local embeddings created at {str(chroma_store)}[/yellow]"
         )
     else:
+        # found a previous vector_store on disk, load it and return instance
         console.print(
-            f"[yellow]Loading existing embeddings from {str(faiss_store)}[/yellow]"
+            f"Loading existing embeddings from {str(chroma_store)}", style="#C8A16D"
         )
-        embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-        vector_store = FAISS.load_local(
-            str(faiss_store), embeddings, allow_dangerous_deserialization=True
+        vector_store = Chroma(
+            embedding_function=embeddings,
+            persist_directory=str(chroma_store),
         )
+        # retriever = vector_store.as_retriever()
+
     return vector_store
 
 
-vector_store = create_or_load_embeddings()
+vector_store = create_or_load_embeddings(embeddings, vector_store)
 
 # now ask the LLM to respond
 from langchain_core.prompts import ChatPromptTemplate
@@ -99,8 +113,9 @@ prompt_template = ChatPromptTemplate.from_messages(
         (
             "system",
             "You are a helpful assistant. Read the question and scan the context provided and "
-            "respond only from the context provided. If answer does not appear in the context respond "
-            "with an appropriate polite message, such as \"I'm sorry, I don't have that information.\"",
+            "respond from the context only. If answer does not appear in the context respond "
+            "with an appropriate polite message, such as \"I'm sorry, I don't have that information.\"."
+            "Don't add any other text to response, such as 'Based on the context provided...' etc.",
         ),
         (
             "user",
@@ -158,5 +173,5 @@ while True:
 
     # get the context for the query from the documents
     response = graph.invoke({"question": query})
-    console.print(f"[green]AI Response: [/green]\n")
+    console.print(f"[green]AI Response: [/green]")
     console.print(Markdown(response["answer"]))
