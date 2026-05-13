@@ -1,7 +1,7 @@
 """
 3_text_splitting_deep_dive.py - exploring various text splitting methods in LangChain
-    We'll be using Google embeddings & ChromaDb but various techniques to split 1
-    text document. We'll choose (randomly) romeo_and_juliet.txt
+    We'll be using OpenAI embeddings & ChromaDb but various techniques to split 1
+    text document. For this module we'll go with the romatic classic romeo_and_juliet.txt
 
 @author: Manish Bhobé
 My experiments with Python, AI/ML and Gen AI.
@@ -12,6 +12,8 @@ import sys, os, time
 from pathlib import Path
 from typing import List
 
+# NOTE: I am adding the parent folder of this file to the Python
+# sys.path, so I can use utility functions in the utils/rich_logging.py file!
 append_to_sys_path = Path(__file__).parent.parent
 if str(append_to_sys_path) not in sys.path:
     sys.path.append(str(append_to_sys_path))
@@ -21,10 +23,10 @@ from dotenv import load_dotenv
 from rich.console import Console
 from utils.rich_logging import get_logger
 
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import (
+from langchain_text_splitters import (
     CharacterTextSplitter,
     RecursiveCharacterTextSplitter,
     SentenceTransformersTokenTextSplitter,
@@ -32,14 +34,13 @@ from langchain.text_splitter import (
     TokenTextSplitter,
 )
 
-
 # load API keys
-load_dotenv()
+load_dotenv(override=True)
 console = Console()
 logger = get_logger()
 
 book_path = Path(__file__).parent / "books" / "romeo_and_juliet.txt"
-chromadb_dir = Path(__file__).parent / "chroma_db"
+chromadb_dir = Path(__file__).parent / "chroma_db/romeo_and_juliet"
 
 if not chromadb_dir.exists():
     chromadb_dir.mkdir(parents=True, exist_ok=True)
@@ -57,7 +58,7 @@ loader = TextLoader(str(book_path), encoding="utf-8")
 documents = loader.load()
 
 # Initialize embeddings
-embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+embeddings = OpenAIEmbeddings()
 
 
 # function to create vector store
@@ -155,7 +156,7 @@ def query_vector_store(store_name, query):
     if persistent_dir.exists():
         console.print(f"[green]Querying vector store {store_name}[green]")
         # Initialize embeddings
-        embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+        embeddings = OpenAIEmbeddings()
         db = Chroma(
             persist_directory=str(persistent_dir),
             embedding_function=embeddings,

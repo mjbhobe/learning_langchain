@@ -1,6 +1,7 @@
 """
-1a_rag_basics.py - build the vector store in the faiss_index__ directory
-  NOTE: we do not call LLM yet!
+1a_rag_basics.py - build the vector store for the file books/odyssey.txt.
+    The vector store is created in the chroma_db/books subfolder.
+    NOTE: we do not use an LLM in this module!
 
 @author: Manish Bhobé
 My experiments with Python, AI/ML and Gen AI.
@@ -10,6 +11,8 @@ Code is shared for learning purposed only - use at own risk!
 import sys
 from pathlib import Path
 
+# NOTE: I am adding the parent folder of this file to the Python
+# sys.path, so I can use utility functions in the utils/rich_logging.py file!
 append_to_sys_path = Path(__file__).parent.parent
 if str(append_to_sys_path) not in sys.path:
     sys.path.append(str(append_to_sys_path))
@@ -20,25 +23,23 @@ from rich.console import Console
 from rich.markdown import Markdown
 from utils.rich_logging import get_logger
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_community.vectorstores import FAISS
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain.chains import RetrievalQA
 
 # load API keys
-load_dotenv()
+load_dotenv(override=True)
 console = Console()
 logger = get_logger()
 
-faiss_index_path = Path(__file__).parent / "faiss_index__"
+chroma_index_path = Path(__file__).parent / "chroma_db/books"
 
-if not faiss_index_path.exists():
+if not chroma_index_path.exists():
     # create the embeddings
-    logger.info("Creating offline vector store")
+    logger.info("Creating offline ChromaDB vector store")
 
     # build path to the file we want to embed
     source_docs_path = Path(__file__).parent / "books" / "odyssey.txt"
@@ -61,76 +62,15 @@ if not faiss_index_path.exists():
 
     # build vector store & save offline
     console.print(f"[green]Creating embeddings...[/green]")
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-    vector_store = FAISS.from_documents(chunks, embeddings)
-    vector_store.save_local(str(faiss_index_path))
-    logger.info(f"Embeddings saved to path {str(faiss_index_path)}")
+    embeddings = OpenAIEmbeddings()
+    vector_store = Chroma.from_documents(
+        documents=chunks,
+        embedding=embeddings,
+        persist_directory=str(chroma_index_path),
+    )
+    logger.info(f"Embeddings saved to path {str(chroma_index_path)}")
 else:
-    logger.info(f"FAISS index created at {str(faiss_index_path)}")
-    console.print(f"[green]FAISS index created at {str(faiss_index_path)}[/green]")
-
-    # Initialize embeddings
-    # embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-
-    # # Load the FAISS vector store
-    # vector_store = FAISS.load_local(
-    #     str(faiss_index_path), embeddings, allow_dangerous_deserialization=True
-    # )
-
-    # # Initialize retriever (retrieve 3 nearest semantically similar chunks)
-    # retriever = vector_store.as_retriever(
-    #     search_type="similarity_score_threshold",
-    #     search_kwargs={"k": 3, "score_threshold": 0.4},
-    # )
-
-    # # Initialize LLM
-    # # create my LLM - using Google Gemini
-    # llm = ChatGoogleGenerativeAI(
-    #     model="gemini-2.0-flash",
-    #     temperature=0.2,
-    #     max_tokens=None,
-    #     timeout=None,
-    #     max_retries=2,
-    #     # other params...
-    # )
-
-    # # # Prompt template
-    # # template = """
-    # # You are an AI assistant helping with questions based on the following context:
-    # # {context}
-
-    # # Question: {question}
-    # # Answer as best as possible based on the context above.
-    # # """
-
-    # # prompt = PromptTemplate.from_template(template)
-    # # chain = (
-    # #     {"context": retriever, "question": lambda x: x["question"]}
-    # #     | prompt
-    # #     | llm
-    # #     | StrOutputParser()
-    # # )
-
-    # # Create RetrievalQA chain
-    # qa_chain = RetrievalQA.from_chain_type(
-    #     llm=llm,
-    #     chain_type="stuff",
-    #     retriever=retriever,
-    #     return_source_documents=True,
-    # )
-
-    # # infinite loop
-    # question = ""
-    # while True:
-    #     console.print("[green]Your question? [/green]")
-    #     question = input().lower().strip()
-    #     if question in ["exit", "quit", "bye"]:
-    #         logger.debug(f"You entered {question} - exiting!")
-    #         console.print("[red]Exiting...[/red]")
-    #         break
-
-    #     # run your chain
-    #     logger.debug(f"Asking LLM to respond to {question}")
-    #     result = qa_chain.invoke({"query": question})
-    #     console.print("[yellow]Answer:[/yellow]\n")
-    #     console.print(Markdown(result["result"]))
+    logger.info(f"ChromaDB store exists at path {str(chroma_index_path)}")
+    console.print(
+        f"[green]ChromaDB store exists at path {str(chroma_index_path)}[/green]"
+    )

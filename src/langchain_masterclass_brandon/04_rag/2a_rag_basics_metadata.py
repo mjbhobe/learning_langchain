@@ -1,6 +1,6 @@
 """
-1a_rag_basics_metadata.py - build the vector store in the chroma_index_with_metadata
-    directory that holds embeddings & meta data for multiple books
+1a_rag_basics_metadata.py - build the vector store in the chroma_db/books_with_metadata
+    directory that holds embeddings & meta data for multiple books from the books folder.
   NOTE: we do not call LLM yet!
 
 @author: Manish Bhobé
@@ -11,6 +11,8 @@ Code is shared for learning purposed only - use at own risk!
 import sys, os, time
 from pathlib import Path
 
+# NOTE: I am adding the parent folder of this file to the Python
+# sys.path, so I can use utility functions in the utils/rich_logging.py file!
 append_to_sys_path = Path(__file__).parent.parent
 if str(append_to_sys_path) not in sys.path:
     sys.path.append(str(append_to_sys_path))
@@ -22,24 +24,24 @@ from rich.progress import Progress, BarColumn, TextColumn
 from rich.markdown import Markdown
 from utils.rich_logging import get_logger
 
-from langchain.text_splitter import CharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 
 # load API keys
-load_dotenv()
+load_dotenv(override=True)
 console = Console()
 logger = get_logger()
 
-chromadb_index_path = Path(__file__).parent / "chroma_db" / "index_with_metadata"
+chromadb_index_path = Path(__file__).parent / "chroma_db" / "books_with_metadata"
 source_docs_path = Path(__file__).parent / "books"
+
+console.print(source_docs_path)
 
 if not chromadb_index_path.exists():
     # create the embeddings
-    console.print(
-        "[yellow]Persistent directory does not exist. Initializing vector store...[/yellow]"
-    )
+    console.print("[yellow]Creating vector store from all books...[/yellow]")
 
     # build path to the file we want to embed
 
@@ -53,7 +55,7 @@ if not chromadb_index_path.exists():
     # load all .txt files from the books folder
     book_files = [f for f in os.listdir(source_docs_path) if f.endswith("txt")]
     num_files = len(book_files)
-    logger.debug(f"Files detected: {book_files}")
+    logger.debug(f"Detected {num_files} files to load")
 
     bar_width = 40
     # for book in book_files:
@@ -74,29 +76,34 @@ if not chromadb_index_path.exists():
             progress.update(task, advance=1, filename=book)
             documents = []
             book_path = os.path.join(source_docs_path, book)
-            # progress.update(task, description=f"[green]Processing: {book}[/green]")
             loader = TextLoader(book_path, encoding="utf-8")
             book_docs = loader.load()
             # set source metadata for each book_doc
-            for book_doc in book_docs:
-                book_doc.metadata = {"source": book_path}
-                documents.append(book_doc)
+            for doc in book_docs:
+                doc.metadata = {"source": book_path}
+                documents.append(doc)
 
             # split into chunks
-            text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=25)
+            text_splitter = RecursiveCharacterTextSplitter(
+                chunk_size=1000, chunk_overlap=25
+            )
             chunks = text_splitter.split_documents(documents)
 
-            # embed
-            embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+            # embed chunks and save them per book
+            # NOTE: we can also embed all chunks across ALL books
+            # in one go, but that would send too much data at once
+            # to our LLM, which could break our API reliability and
+            # token limits!
+            embeddings = OpenAIEmbeddings()
             vector_store = Chroma.from_documents(
                 chunks,
                 embeddings,
                 persist_directory=str(chromadb_index_path),
             )
 
-            # print(documents)
+        # print(documents)
 
-        logger.info(f"Embeddings saved to path {str(chromadb_index_path)}")
+        logger.info(f"\nEmbeddings saved to path {str(chromadb_index_path)}")
         console.print(
             f"[green]Embeddings saved to path[/green] {str(chromadb_index_path)}"
         )
