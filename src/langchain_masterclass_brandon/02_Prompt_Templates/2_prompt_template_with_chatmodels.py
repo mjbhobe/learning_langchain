@@ -1,6 +1,6 @@
 """
-prompt_template_with_chatmodel.py - here we will interface the prompt with a chat model
-    (Google Gemini) and get a response.
+prompt_template_with_chatmodel.py - here we will interface the prompt with a
+    chat model and get a response.
 
 @Author: Manish Bhobé
 My experiments with AI/Gen AI. Code shared for learning purposes only.
@@ -8,18 +8,16 @@ Use at your own risk!!
 """
 
 from dotenv import load_dotenv
-from rich.console import Console
-from rich.markdown import Markdown
-
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+from rich.console import Console
 
 # load all environment variables
 load_dotenv()
 
 # create my LLM - using Google Gemini
-model = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
+model = ChatOpenAI(
+    model="gpt-5-nano",
     temperature=0,
     max_tokens=None,
     timeout=None,

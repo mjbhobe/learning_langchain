@@ -1,7 +1,7 @@
 """
 chat_model_basic_conversation.py - extending the basic Q&A chat model to
     simiulate a conversation with SystemMessage, HumanMessage & AIMessage
-    using LangChain & Google Gemini.
+    using LangChain.
 
 @Author: Manish Bhobé
 My experiments with AI/Gen AI. Code shared for learning purposes only.
@@ -9,23 +9,21 @@ Use at your own risk!!
 """
 
 from dotenv import load_dotenv
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_openai import ChatOpenAI
 from rich.console import Console
 from rich.markdown import Markdown
 
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
-
 # load all environment variables
-load_dotenv()
+load_dotenv(override=True)
 
-# create my LLM - using Google Gemini
-model = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
-    temperature=0,
+# create an instance of the LLM (we'll use OpenAI GPT 5 Nano)
+model = ChatOpenAI(
+    model="gpt-5-nano",
+    temperature=0.0,
     max_tokens=None,
     timeout=None,
     max_retries=2,
-    # other params...
 )
 # only for colorful text & markdown output support
 console = Console()

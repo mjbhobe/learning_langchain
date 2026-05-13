@@ -1,5 +1,5 @@
 """
-prompt_template_basic.py - basic prompt template with LangChain & Gemi
+prompt_template_basic.py - basic prompt template with LangChain
 
 @Author: Manish Bhobé
 My experiments with AI/Gen AI. Code shared for learning purposes only.
@@ -7,10 +7,8 @@ Use at your own risk!!
 """
 
 from dotenv import load_dotenv
-from rich.console import Console
-from rich.markdown import Markdown
-
 from langchain_core.prompts import ChatPromptTemplate
+from rich.console import Console
 
 # load all environment variables
 load_dotenv()
@@ -18,10 +16,15 @@ load_dotenv()
 # only for colorful text & markdown output support
 console = Console()
 
-# create out prompt template
+# all key LangChain classes - models, prompts, chains etc. inherit from
+# Runnable class. So each sub-class implements an invoke() method
+
+# create out prompt template with our variables - topic in this case
 prompt_str = "Tell me a joke about [{topic}]"
 prompt_template = ChatPromptTemplate.from_template(prompt_str)
-# console.print(f"Prompt template: [yellow]{prompt_template}[/yellow]")
+# the invoke() call on prompt templates "formats" our message - like
+# a Python format() call on a string, which replaces place holders with
+# actual values of placeholders
 prompt = prompt_template.invoke({"topic": "Rahul Gandhi"})
 console.print(f"Prompt (with 1 param): [yellow]{prompt}[/yellow]")
 

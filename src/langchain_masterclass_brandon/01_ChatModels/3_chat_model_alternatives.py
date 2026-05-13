@@ -1,7 +1,7 @@
 """
 chat_model_alternatives.py - illustrates use of other LLM providers, such as
-    OpenAI ChatGPT or Anthropic Claude. You'll need API keys for both these
-    providers.
+    Google Gemini or Anthropic Claude. You'll need API keys for both these
+    providers. Add these to your local .env file.
 
 @Author: Manish Bhobé
 My experiments with AI/Gen AI. Code shared for learning purposes only.
@@ -9,18 +9,18 @@ Use at your own risk!!
 """
 
 import random
-import sys
+
 from dotenv import load_dotenv
+from langchain_anthropic import ChatAnthropic
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from rich.console import Console
 from rich.markdown import Markdown
 
-from langchain_openai import ChatOpenAI
-from langchain_anthropic import ChatAnthropic
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
-
 # load all environment variables
-load_dotenv()
+load_dotenv(override=True)
+console = Console()
 
 SUPPORTED_PROVIDERS = ["openai", "anthropic", "google"]
 
@@ -32,7 +32,7 @@ def get_model(provider: str):
 
     if provider == "openai":
         model = ChatOpenAI(
-            model="gpt-4o",
+            model="gpt-5-nano",
             temperature=0,
             max_tokens=None,
             timeout=None,
@@ -51,7 +51,7 @@ def get_model(provider: str):
     elif provider == "google":
         # create my LLM - using Google Gemini
         model = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             temperature=0,
             max_tokens=None,
             timeout=None,
@@ -65,7 +65,9 @@ def get_model(provider: str):
 
 # randomly pick a provider
 provider_index = random.choice(range(len(SUPPORTED_PROVIDERS)))
-print(f"Randomly chosen provider: {SUPPORTED_PROVIDERS[provider_index]}")
+console.print(
+    f"Randomly chosen provider: [yellow]{SUPPORTED_PROVIDERS[provider_index]}[/yellow]"
+)
 model = get_model(SUPPORTED_PROVIDERS[provider_index])
 
 # only for colorful text & markdown output support
