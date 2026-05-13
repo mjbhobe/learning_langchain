@@ -10,17 +10,17 @@ from dotenv import load_dotenv
 from rich.console import Console
 from rich.markdown import Markdown
 
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.schema.output_parser import StrOutputParser
-from langchain.schema.runnable import RunnableLambda, RunnableBranch
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableLambda, RunnableBranch
 
 # load all environment variables
 load_dotenv()
 
 # create my LLM - using Google Gemini
-model = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
+model = ChatOpenAI(
+    model="gpt-5-nano",
     temperature=0,
     max_tokens=None,
     timeout=None,
@@ -111,10 +111,13 @@ negative_feedback = """
 I has high expectations of CleenoBot, especially after seeing the demo. However I am dissappointed with the quality of cleaning. It hardly picks up any dust or dirt off the carpet and can hardly reach the corners of my room. I am returning this & will not recommend this to anyone."""
 
 neutral_feedback = """
-The CleenoBot is okay, but it doesn't do anything special. It cleans the floors, but I expected more features for the price. It's not bad, but it's not great either."""
+I have been using the CleenoBot for a week now. It performs the basic cleaning tasks as described in the manual and handles most floor surfaces adequately. The battery life is consistent with the product specifications provided. It is a functional appliance that performs its intended job without 
+any major issues or standout features."""
 
 escalation_feedback = """
-I am not happy with the CleenoBot. It does not clean my floors properly and I have tried to contact support but have not received a response. I'd like to speak to your manager - want my money back. This is cheating!!!"""
+This CleenoBot is an absolute safety hazard and a total scam. During its first run, the battery overheated 
+to a dangerous level and left visible scorch marks on my hardwood floors—it’s a miracle it didn’t start a fire. Your customer service line is a joke and no one is taking responsibility for the property damage. 
+I am demanding an immediate full refund and want to speak with a senior manager today. If this isn't resolved within 24 hours, I will be filing a formal complaint with the Consumer Product Safety Commission and contacting my legal counsel. Absolutely pathetic product and even worse company."""
 
 # console.print(f"[green]Positive Review:[/green] {positive_feedback}\n")
 # response = chain.invoke({"feedback": positive_feedback})
@@ -128,6 +131,32 @@ I am not happy with the CleenoBot. It does not clean my floors properly and I ha
 # response = chain.invoke({"feedback": neutral_feedback})
 # console.print(Markdown(response))
 
-console.print(f"[red]Escalation Review:[/red] {escalation_feedback}\n")
-response = chain.invoke({"feedback": escalation_feedback})
-console.print(Markdown(response))
+# this piece of code shows you how the classification chain works
+# for each type of feedback
+
+# for feedback in [
+#     positive_feedback,
+#     negative_feedback,
+#     neutral_feedback,
+#     escalation_feedback,
+# ]:
+#     response = classification_branch.invoke({"feedback": feedback})
+#     console.print(f"[blue]Feedback: [/blue] {feedback}")
+#     console.print(f"[cyan]Classification: [/cyan] {response}")
+
+# now let's see how thw chain works for each type of feedback
+for feedback in [
+    positive_feedback,
+    negative_feedback,
+    neutral_feedback,
+    escalation_feedback,
+]:
+    response = chain.invoke({"feedback": feedback})
+    console.print(f"[blue]Feedback: [/blue] {feedback}")
+    console.print(f"[cyan]Email generated: [/cyan] {response}")
+    print("--" * 50 + "\n\n")
+
+
+# console.print(f"[red]Escalation Review:[/red] {escalation_feedback}\n")
+# response = chain.invoke({"feedback": escalation_feedback})
+# console.print(Markdown(response))

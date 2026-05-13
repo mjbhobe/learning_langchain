@@ -9,17 +9,17 @@ Use at your own risk!!
 from dotenv import load_dotenv
 from rich.console import Console
 
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.schema.output_parser import StrOutputParser
-from langchain.schema.runnable import RunnableLambda, RunnableSequence
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableLambda, RunnableSequence
 
 # load all environment variables
-load_dotenv()
+load_dotenv(override=True)
 
 # create my LLM - using Google Gemini
-model = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
+model = ChatOpenAI(
+    model="gpt-5-nano",
     temperature=0,
     max_tokens=None,
     timeout=None,
@@ -38,6 +38,7 @@ prompt_template = ChatPromptTemplate.from_messages(messages)
 
 # create our runnable lambdas
 uppercase_output = RunnableLambda(lambda x: x.upper())
+# count_words lambda prints count of words in x and then x on the next line
 count_words = RunnableLambda(lambda x: f"Word count: {len(x.split())}\n{x}")
 
 # now build a chain

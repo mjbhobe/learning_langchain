@@ -9,17 +9,17 @@ Use at your own risk!!
 from dotenv import load_dotenv
 from rich.console import Console
 
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.schema.output_parser import StrOutputParser
-from langchain.schema.runnable import RunnableLambda, RunnableParallel
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableLambda, RunnableParallel
 
 # load all environment variables
-load_dotenv()
+load_dotenv(override=True)
 
 # create my LLM - using Google Gemini
-model = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
+model = ChatOpenAI(
+    model="gpt-5-nano",
     temperature=0,
     max_tokens=None,
     timeout=None,
@@ -87,10 +87,14 @@ def combine_pros_and_cons(pros, cons):
 
 # now build a chain
 chain = (
+    # this part of the chain asks the model for features of product specified
     prompt_template
     | model
     | StrOutputParser()
+    # this part of the chain fires off 2 parallel branches that analyze
+    # only the pros (pros_branch_chain) and only the cons (cons_branch_chain)
     | RunnableParallel(branches={"pros": pros_branch_chain, "cons": cons_branch_chain})
+    # this part of the chain then combined the pros & cons into final output
     | RunnableLambda(
         lambda x: combine_pros_and_cons(x["branches"]["pros"], x["branches"]["cons"])
     )
