@@ -9,17 +9,14 @@ Code is shared for learning purposed only - use at own risk!
 from dotenv import load_dotenv
 from rich.console import Console
 
-from langchain import hub
-from langchain.agents import AgentExecutor, create_react_agent
 from langchain_core.tools import Tool
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
+from langgraph.prebuilt import create_react_agent
 
-
-load_dotenv()
+load_dotenv(override=True)
 console = Console()
 
 
-# function to tell time
 def get_current_time(*args, **kwargs) -> str:
     """Returns the current time in H:MM AM/PM format."""
     from datetime import datetime
@@ -35,35 +32,18 @@ tools = [
     )
 ]
 
-# create your model
-model = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    temperature=0,
+model = ChatOpenAI(
+    model="gpt-5-nano",
+    temperature=0.0,
     max_tokens=None,
     timeout=None,
     max_retries=2,
-    # other params...
 )
 
-# your prompt
-prompt = hub.pull("hwchase17/react")
-console.print(f"Prompt: {prompt}")
+# create_react_agent returns a compiled LangGraph with ReAct logic built-in
+agent_executor = create_react_agent(model=model, tools=tools)
 
-# create the agent
-agent = create_react_agent(
-    llm=model,
-    prompt=prompt,
-    tools=tools,
-    stop_sequence=True,
+response = agent_executor.invoke(
+    {"messages": [{"role": "user", "content": "What is the current time?"}]}
 )
-
-# execute the agent
-agent_executer = AgentExecutor.from_agent_and_tools(
-    agent=agent,
-    tools=tools,
-    verbose=True,
-)
-
-# execute the agents
-response = agent_executer.invoke({"input": "What is the current time?"})
-console.print(f"[green]Response: [/green] {response['output']}")
+console.print(f"[green]Response:[/green] {response['messages'][-1].content}")
