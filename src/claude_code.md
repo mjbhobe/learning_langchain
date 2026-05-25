@@ -152,5 +152,34 @@ You can also use the `Explore` command to ask Claude Code to explore your codeba
 ### Code
 Now once the plan looks good, you can select "Approve" to accept the plan and let Claude handle all the items in the Plan it provided. Claude will review the codebase (new code it generates or code it updates) before it considers the plan as finished.
 
+## Customizing Claude Code
+One of the most useful parts of Claude Code is the `CLAUDE.md` file. It gives Claude Code persistent memory about your Claude project. When you open up Claude Code without a `CLAUDE.md` file, it's like it has to start afresh every single time.
 
+It has to re-explore your codebase, understand the dependencies are needed and the features that are already implemented. Sometimes it has to make assumptions, which makes it harder for us to steer Claude in the right direction. That's where `CLAUDE.md` file comes in.
+
+It's a markdown file that you add to the root of your project and Claude Code reads it automatically everytime you start a session in the project's folder. It's like an onboarding script for your codebase. **Simply put, the contents of CLAUDE.md file are appended to your own prompt each time**
+
+You can run the `/init` command which will make Claude generate one off your codebase.
+
+Here is a sample CLAUDE.md file for a web application:
+```markdown
+# Project
+This is a Next.js 15 app using the App Router, Tailwind and Drizzle ORM
+
+# Commands
+- Dev Server: `pnpm dev`
+- Run tests: `pnpm test`
+- Lint: `pnpm lint`
+
+# Code Style
+- Use 2 space indentation
+- Prefer named exports
+- All API routes go in app/api
+- Use server actions instead of API routes where possible
+```
+
+Now when I ask Claude Code to create a React component, it knows how to style it with Tailwind or any other CSS framework that I'll be using. We see that Claude Code does a better job at doing its job right off the bat. First is having to understand where everything is at first.
+
+### Sharing your CLAUDE.md file
+You can (it is recommended) share this file in your version control system for your team to use. But there is a hierarchy of memory files depending on who it is for.
 
