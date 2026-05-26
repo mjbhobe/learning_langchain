@@ -153,15 +153,16 @@ You can also use the `Explore` command to ask Claude Code to explore your codeba
 Now once the plan looks good, you can select "Approve" to accept the plan and let Claude handle all the items in the Plan it provided. Claude will review the codebase (new code it generates or code it updates) before it considers the plan as finished.
 
 ## Customizing Claude Code
-One of the most useful parts of Claude Code is the `CLAUDE.md` file. It gives Claude Code persistent memory about your Claude project. When you open up Claude Code without a `CLAUDE.md` file, it's like it has to start afresh every single time.
+One of the most useful parts of Claude Code is the `CLAUDE.md` file (name **is** case-sensitive!). It gives Claude Code persistent memory about your Claude project. 
 
-It has to re-explore your codebase, understand the dependencies are needed and the features that are already implemented. Sometimes it has to make assumptions, which makes it harder for us to steer Claude in the right direction. That's where `CLAUDE.md` file comes in.
+When you open up Claude Code without a `CLAUDE.md` file, it's like it has to start afresh every single time. It has to re-explore your codebase, understand the dependencies are needed and the features that are already implemented. Sometimes it has to make assumptions, which makes it harder for us to steer Claude in the right direction. That's where `CLAUDE.md` file comes in.
 
 It's a markdown file that you add to the root of your project and Claude Code reads it automatically everytime you start a session in the project's folder. It's like an onboarding script for your codebase. **Simply put, the contents of CLAUDE.md file are appended to your own prompt each time**
 
 You can run the `/init` command which will make Claude generate one off your codebase.
 
 Here is a sample CLAUDE.md file for a web application:
+
 ```markdown
 # Project
 This is a Next.js 15 app using the App Router, Tailwind and Drizzle ORM
@@ -181,5 +182,21 @@ This is a Next.js 15 app using the App Router, Tailwind and Drizzle ORM
 Now when I ask Claude Code to create a React component, it knows how to style it with Tailwind or any other CSS framework that I'll be using. We see that Claude Code does a better job at doing its job right off the bat. First is having to understand where everything is at first.
 
 ### Sharing your CLAUDE.md file
+
 You can (it is recommended) share this file in your version control system for your team to use. But there is a hierarchy of memory files depending on who it is for.
 
+* **Project User:** `project/CLAUDE.md` - this is a project level file that _lives in the root directory of your project_. <br/>It **serves as the standing system prompt and persistent memory layer for Claude Code**. It automatically injects project guidelines, build commands, and tech stack contexts straight into Claude's memory at the start of every session so you do not have to repeat context every time you prompt.<br/>If you have any files in your project folder that you want Claude to refer to, add them to this file with a `@` prompt. For example:
+```
+Database connection info is in @docs/database.md
+Architecture definition is in @docs/architecture.md
+```
+* **User Level:** `~/.claude/CLAUDE.md (Mac or linux) or %USERPROFILE%\.claude\CLAUDE.md (Windows)` - this is a user-level CLAUDE.md file that lives in the root directory of your configuration folder.<br/> This file **holds your personal, cross-project preferences**. If you want Claude to always use a sarcastic humor style, write tests before implementation across every app you build, or avoid code comments, you define it here.
+
+
+It is recommended that you start a new project WITHOUT a CLAUDE.md file, so you can see where you have to constantly course correct the Claude model. This keeps your CLAUDE.md file compact and contain only the necessary information that Claude can work with. The difference between a frustrating Claude Code session and a productive one comes down to the context. And CLAUDE.md is how you provide that context.
+
+Start with your tech-stack, your preferenced and your commands [to build, test etc.] and build from there as you go.
+
+## Sub-Agents
+
+Sub-agents are specialized assistants that Claude Code can delegate tasks to. Each sub-agent runs within it's own conversation context window, with a custom system prompt that you define.
