@@ -83,6 +83,7 @@ Use the following command from the shell to install Claude code in one go:
 ```bash
 $> curl -fsSL https://claude.ai/install.sh | bash
 ```
+
 On MacOS, you can also use HomeBrew to install Claude Code, but note that it does not have auto-update capability.
 
 **Windows**
@@ -102,6 +103,7 @@ $> winget install -e --id Anthropic.ClaudeCode
 Just like Homebrew, it will not auto-update.
 
 ### Starting Claude Code
+
 * After installing Claude code for your respective OS, start a terminal/command prompt window and navigate to your code folder.
 * Type in `claude` at the command prompt to start Claude Code in your project directory. The very first time you run this, it will ask you for some preferences (such as mode - light/dark etc.; color-theme to use etc.)
 * Then sign in with your claude account (Pro/Max or Entrprise) OR you can use an API key from Anthropic. 
@@ -118,6 +120,7 @@ Just like Homebrew, it will not auto-update.
 ## Your First Prompt
 
 You talk to Claude Code just as you would talk to any AI Assistant (or chat application, such as ChatGPT). For example, here is a prompt to create a complete application:
+
 ```bash
 Create a FastAPI project that lets me talk with the claude API
 ```
@@ -130,6 +133,7 @@ Here are some things to consider that will protect and make things easier for yo
 When using Claude Code try to be as descriptive as possible with your prompt.
 
 ## Daily Workflows
+
 If there is one thing you want to take from Claude Code, let it be this workflow:
 ```
 Explore -> Plan -> Code -> Commit
@@ -137,22 +141,29 @@ Explore -> Plan -> Code -> Commit
 Without this, most people ask Claude to directly generate code, which usually means a lot of course correction along the way.
 
 ### Explore and Plan
+
 The fastest way to handle Step 1 & 2 in the workflow above is with **Plan Mode**. In Plan Mode, Claude Code cannot edit files. It just reads files to research about how to tackle the implementation of user's request. [Hit `Shift+Tab` key in Terminal experience, until you see plan mode]
 
 For example, here is a request you could make in Plan model:
+
 ```
 > I need to add webp conversion to our image upload pipeline. Figure out where in the pipeline it should happen, whether we need new dependencies and how to approach it.
 ```
+
 And Claude Code will go off, read your entire code base, refer to the web and return with a complete plan of action - no changes to code files! At this point, you can review the recommendations and determine if it meets your criteria and accept/or ask Claude to do something else. For example:
+
 ```bash
 > Can you limit the uploads to 10Mb?
 ```
+
 You can also use the `Explore` command to ask Claude Code to explore your codebase _without_ being in the _plan mode_.
 
 ### Code
+
 Now once the plan looks good, you can select "Approve" to accept the plan and let Claude handle all the items in the Plan it provided. Claude will review the codebase (new code it generates or code it updates) before it considers the plan as finished.
 
 ## Customizing Claude Code
+
 One of the most useful parts of Claude Code is the `CLAUDE.md` file (name **is** case-sensitive!). It gives Claude Code persistent memory about your Claude project. 
 
 When you open up Claude Code without a `CLAUDE.md` file, it's like it has to start afresh every single time. It has to re-explore your codebase, understand the dependencies are needed and the features that are already implemented. Sometimes it has to make assumptions, which makes it harder for us to steer Claude in the right direction. That's where `CLAUDE.md` file comes in.
@@ -186,10 +197,12 @@ Now when I ask Claude Code to create a React component, it knows how to style it
 You can (it is recommended) share this file in your version control system for your team to use. But there is a hierarchy of memory files depending on who it is for.
 
 * **Project User:** `project/CLAUDE.md` - this is a project level file that _lives in the root directory of your project_. <br/>It **serves as the standing system prompt and persistent memory layer for Claude Code**. It automatically injects project guidelines, build commands, and tech stack contexts straight into Claude's memory at the start of every session so you do not have to repeat context every time you prompt.<br/>If you have any files in your project folder that you want Claude to refer to, add them to this file with a `@` prompt. For example:
+
 ```
 Database connection info is in @docs/database.md
 Architecture definition is in @docs/architecture.md
 ```
+
 * **User Level:** `~/.claude/CLAUDE.md (Mac or linux) or %USERPROFILE%\.claude\CLAUDE.md (Windows)` - this is a user-level CLAUDE.md file that lives in the root directory of your configuration folder.<br/> This file **holds your personal, cross-project preferences**. If you want Claude to always use a sarcastic humor style, write tests before implementation across every app you build, or avoid code comments, you define it here.
 
 
@@ -199,4 +212,28 @@ Start with your tech-stack, your preferenced and your commands [to build, test e
 
 ## Sub-Agents
 
-Sub-agents are specialized assistants that Claude Code can delegate tasks to. Each sub-agent runs within it's own conversation context window, with a custom system prompt that you define.
+Sub-agents are specialized assistants that Claude Code can delegate tasks to. Each sub-agent runs within it's own conversation context window, with a custom system prompt that you define. When finished, it returns a summary to the main thread while all the intermediate work stays isolated. One  of the main advantages of sub-agents is that they help manage context window usage.
+
+### The main context window and sub-agent context window
+
+When you chat with Claude Code, you are adding context to the main context window. Every tool call and its results get saved in this main context window. And so, when Claude uses a sub-agent, a separate windows starts. The sub-agent receives 2 inputs - a custom system prompt from your configuration file and a task description writtem by the parent or parent-agent based on what you asked for. The sub-agent then works autonomously when it reads files, edits files, uses tools - none of these will appear in the main conversation. Just a summary is returned. The entire sub-agent conversation then gets discarded.
+
+### What this means in practice
+
+Consider a task of investigating how the payments system works in an unfamiliar codebase - maybe your are trying to use Claude Code to investigate which service handles refunds. Without a sub-agent, Claude might investigate 15 files, run several searches and trace through several function calls. All of that context fills your context window, even if you only needed 1 single fact - which service handles refunds. 
+
+With a sub-agent, you get the answer, without the journey. The sub-agent explores, discovers the answer, and returns a focused summary keeping your main context clean! The main agent loses visibility on how the sub-agent reached the conclusion and what it discovered along the way.
+
+### Built-in sub-agents
+
+Claude Code includes several built-in sub-agents that you can use immediately, like:
+* **General-purpose sub-agent**: used for multi-step tasks that require both exploration and action.
+* **Explorer sub-agent**: which is used to explore codebases.
+* **Plan sub-agent**: used during plan mode for research and analysis of your codebases before presenting a plan.
+* **Custom agents**: And you can also create your own sub-agent with custom system prompt and tool access.
+
+Sub-agents let Claude Code break work into focused pieces, keep your main context window clean and bring back just what you need. Whether you're using built-in ones or creating your own, they are a practical way to get more out of longer Claude Code sessions.
+
+## Skills
+
+Every time you explain your team's coding standards to Claude, 

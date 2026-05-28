@@ -48,10 +48,14 @@ def fake_llm(x: int) -> str:
 # now build a chain like this using LCEL (LangChain Expression Language)
 chain = (
     # have used the funny lambda syntax for the first RunnableLambda as
-    # get_radius() does not take a parameter, but invoke()
+    # get_radius() does not take a parameter, but invoke() requires at least 1
     RunnableLambda(lambda _: get_radius())
     | RunnableLambda(calculate_circle_area)
 )
+
+# think of the above chain as expanding in reverse order as below:
+# calculate_circle_area_runnable_lambda.invoke(get_radius_runnable_lambda.invoke(None))
+
 
 # NOTE: the invoke() function requires a parameter!
 response = chain.invoke(None)
