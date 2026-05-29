@@ -8,14 +8,13 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import SystemMessage, HumanMessage
 
-
 # load API keys from .env file
 load_dotenv(override=True)
 console = Console()
 
 # create instance of Gemini 3 flash model
 gemini_llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
+    model="gemini-3.1-flash-lite",
     temperature=0.1,
 )
 
@@ -23,7 +22,8 @@ gemini_llm = ChatGoogleGenerativeAI(
 prompt = "Tell me a joke about Rahul Gandhi"
 response = gemini_llm.invoke(prompt)
 console.print("[green]Response from Gemini[/green]")
-console.print(Markdown(response.content))
+# console.print(Markdown(response.content))
+console.print(response.content)
 
 messages = [
     SystemMessage(content="You're a helpful programming assistant"),
@@ -33,7 +33,8 @@ messages = [
 
 response = gemini_llm.invoke(messages)
 console.print("[green]Code Generation from Gemini[/green]")
-console.print(Markdown(response.content))
+# console.print(Markdown(response.content))
+console.print(response.content)
 
 
 # now let's go in a loop
@@ -66,7 +67,7 @@ from io import BytesIO
 import pathlib
 
 model = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash-image",
+    model="gemini-3.1-flash-image",
     response_modalities=[Modality.IMAGE],
     temperature=0.1,
     # Optional: configure aspect ratio or other parameters
