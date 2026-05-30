@@ -8,7 +8,6 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import SystemMessage, HumanMessage
 
-
 # load API keys from .env file
 load_dotenv(override=True)
 console = Console()
