@@ -4,7 +4,7 @@ CCSE is a four-part framework purpose-built for developer prompts. It stands for
 **Context**, **Constraints**, **Specification**, **Example**. Use it as a mental checklist for any
 non-trivial request.
 
-## C - Conte t: Set the Stage
+## C - Context: Set the Stage
 **Tell Claude about your environment**: programming language, framework, existing code patterns, team conventions. Claude can't read your mind or your codebase. What you leave out, it fills in with reasonable defaults that may not match your reality.
 
 Example:
