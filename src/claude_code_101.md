@@ -330,3 +330,90 @@ One thing to be aware of is that MCP servers add tool definitions to your contex
 If a tool has a CLI equivalent (like GH for Github), it is more context efficient because it does not add persistent tool definitions. You could also benefit by using a skill in this scenario. The skill's name and description will be loaded into the context, similar to MCP. When Claude thinks it needs to use that skill, it will then load it into the context window, which is where you could put in the command line interface tool. 
 
 If your MCP tools exceed 10% of your context window, Claude Code will automatically switch to tool-search mode, which will discover the right tools on demand, but this might not work as well just because it's not in the context. 
+
+### Hooks
+
+Hooks let you run commands at different times in Claude Code's lifecycle. The key difference between hooks and everything else we learnt so far is that hooks are deterministic - they will always run!
+
+#### Why use hooks?
+
+You could tell Claude Code, in your `CLAUDE.md` file to run `prettier` after every file edit or run `eslint` after every tool call; and most of the time it will work - but it may not run always, because it's not perfect. But a hook makes it happen every single time with no exceptions. Common use-cases could include running a formatter after file edits, logging all executed commands for compliance, blocking dangerous operations like modifying production files, and sending yourself notifications when Claude finishes as task.
+
+#### How Hooks work
+
+Hooks are configured in your `settings.json` file (in IDEs like VS Code or its forks, such as AntiGravity or Cursor). You pick an event (such as `PreToolUse`), optionally set a matcher for which tool it applies to, and provide a command to run (as shown in the snippet below). You configure them through the `/hooks` command inside Claude Code.
+
+```json
+"hooks" : {
+    "PreToolUse": [
+        "matcher" : "Bash",
+        "hooks" : [
+            {
+                "type" : "command",
+                "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/block-dangerous-commands.sh",
+            }
+        ]
+    ],
+    "PostToolUse" : [
+        // fire whenever Claude modified a file
+        "matcher" : "Edit|MultiEdit|Write",
+        "hooks" : [
+            {
+                // run appropriate formatter
+                "type" : "command",
+                // the shell script could run any applicable
+                // formatter for the edited file.
+                "command" : "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/auto-format.sh",
+                "timeout" : 20,
+            }
+        ]
+    ],
+```
+
+| Tool | When Does it Run? |
+| --- | --- |
+| `UserPromptSubmit` | Runs when you submit a prompt, but _before_ Claude processes it. |
+| `PreToolUse` | Runs before a tool call. |
+| `PostToolUse` | Runs after a tool call completes. |
+| `Notificaton` | Runs when Claude sends a notification. |
+| `Stop` | Runs when Claude finishes responding. |
+
+**Let's look at a practical example**:
+
+The most common eample is code formatting after edits - see an example of `PostToolUse` in the JSON file above, which sets up a command to format file (or multiple files) post edit. The shell script `auto-format.sh` file could run an appropriate formatter depending on the file being edited - for example, `prettier` for TypeScript, `ruff` for Python as so on.
+
+#### Blocking with PreToolUse
+
+`PreToolUse` hooks can block tool calls before they execute. Your hook receives the tool name and input as JSON on `stdin`. The exit code determines the behavior:
+
+* **Exit code 0** — proceed normally.
+* **Exit code 2** — _block the action_. The `stderr` message gets fed back to Claude as feedback so it knows why it was blocked and can adjust.
+* **Any other exit code** — a non-blocking error that gets shown to you but doesn't stop anything.
+
+This is how you enforce hard rules. Block writes to a production config directory. Block bash commands that contain `rm -rf`. Block commits to `main`. Whatever your team needs to be guaranteed, not suggested.
+
+Following shows an example in `settings.json`:
+
+```json
+{
+    "hooks" : {
+        "PreToolUse" : [
+            {
+                "matcher" : "Bash",
+                "hooks" : [
+                    "type" : "command",
+                    "command" : "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/block_dangerous_commands.sh",
+                ]
+            }
+        ]
+    }
+}
+```
+
+#### Sharing Hooks with Your Team
+Hooks configured in `.claude/settings.json` are project-level and can be checked into your repo. This means your entire team gets the same hooks automatically. Use the `CLAUDE_PROJECT_DIR` environment variable in your commands to reference scripts stored in your project, so they work regardless of Claude's current working directory.
+
+#### Recap
+Hooks give you deterministic control over Claude Code's behavior. Use `PostToolUse` for auto-formatting and logging. Use `PreToolUse` to block dangerous operations. Configure them with `/hooks` or in `settings.json`. And check them into your repo so your team gets them too.
+
+If something needs to happen every time without fail, don't put it in a prompt. Put it in a hook.
